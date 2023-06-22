@@ -65,10 +65,12 @@ typings/
 # IDE configs
 .idea/
 
-# build output
-.docz/
-site/
-examples/*/dist/
-packages/*/dist/
-packages/*/es/
-packages/*/lib/
+dist
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

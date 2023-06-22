@@ -1,14 +1,31 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "target": "es2015",
     "module": "commonjs",
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "dom",
+      "es2020"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "types"
+    ],
     "strict": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
     "jsx": "react",
-    "noUnusedLocals": true
-  }
+    "noUnusedLocals": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/__data__/**",
+    "src/__tests__/**",
+    "src/__stories__/**"
+  ]
 }

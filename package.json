@@ -1,33 +1,28 @@
 {
-  "private": true,
-  "repository": "git+https://github.com/sgrishchenko/reselect-utils.git",
-  "author": "Sergei Grishchenko",
-  "license": "MIT",
-  "workspaces": [
-    "packages/*",
-    "examples/*"
+  "name": "@veksa/reselect-utils",
+  "version": "5.1.0-p1",
+  "main": "./dist/cjs/reselectUtils.cjs",
+  "module": "./dist/reselectUtils.legacy-esm.js",
+  "types": "./dist/reselectUtils.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/reselectUtils.d.ts",
+      "import": "./dist/reselectUtils.mjs",
+      "default": "./dist/cjs/reselectUtils.cjs"
+    }
+  },
+  "files": [
+    "src",
+    "dist"
   ],
   "scripts": {
+    "build": "npm run clean && tsup",
     "test": "jest",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "format": "prettier --write **/*.{js,ts,tsx,json,md}",
     "compile": "tsc --noEmit",
-    "clean": "shx rm -rf site",
-    "site": "yarn nojekyll && yarn docz:build && yarn storybook:build && yarn typedoc:light && yarn typedoc:dark",
-    "nojekyll": "shx mkdir -p site && shx touch site/.nojekyll",
-    "docz:dev": "docz dev",
-    "docz:build": "docz build --dest site/docz",
-    "storybook:dev": "start-storybook",
-    "storybook:build": "build-storybook --output-dir site/storybook --quiet",
-    "typedoc:light": "typedoc --out site/typedoc/light --theme typedoc-theme/light packages/reselect-utils",
-    "typedoc:dark": "typedoc --out site/typedoc/dark --theme typedoc-theme/dark packages/reselect-utils",
-    "distribute": "yarn workspace reselect-utils version && git push --follow-tags",
-    "deduplicate": "yarn-deduplicate yarn.lock"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn compile && lint-staged"
-    }
+    "clean": "rimraf lib es dist"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [
@@ -40,48 +35,48 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
-    "@rollup/plugin-typescript": "^8.2.1",
-    "@storybook/addon-actions": "^5.3.19",
-    "@storybook/addon-storysource": "^5.3.19",
-    "@storybook/react": "^5.3.19",
     "@types/enzyme": "^3.10.8",
     "@types/enzyme-adapter-react-16": "^1.0.6",
-    "@types/jest": "^26.0.19",
+    "@types/jest": "^29.5.11",
+    "@types/react": "^18.2.45",
+    "@types/shelljs": "^0.8.11",
     "@types/theme-ui": "^0.3.7",
-    "@typescript-eslint/eslint-plugin": "^4.10.0",
-    "@typescript-eslint/parser": "^4.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@veksa/re-reselect": "^5.1.0-p1",
+    "@veksa/reselect": "^5.1.0-p1",
     "babel-loader": "^8.2.2",
-    "coveralls": "^3.1.0",
-    "docz": "^2.2.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
     "enzyme-to-json": "^3.6.1",
-    "eslint": "^7.21.0",
-    "eslint-config-airbnb-typescript": "^12.0.0",
-    "eslint-config-prettier": "^7.0.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-prettier": "^3.3.0",
-    "eslint-plugin-react": "^7.21.5",
-    "eslint-plugin-react-hooks": "^4.2.0",
+    "eslint": "^8.55.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^4.3.6",
-    "jest": "^26.6.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^10.5.3",
     "prettier": "^2.2.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-feather": "^2.0.9",
-    "rollup": "^2.45.2",
+    "rimraf": "5.0.5",
+    "shelljs": "^0.8.5",
     "shx": "^0.3.3",
     "theme-ui": "^0.2.52",
-    "ts-jest": "^26.4.4",
+    "ts-jest": "^29.1.1",
     "ts-loader": "^8.0.12",
     "ts-node": "^9.1.1",
-    "tslib": "^2.0.3",
+    "tslib": "^2.6.2",
+    "tsup": "^6.7.0",
     "typedoc": "^0.19.2",
-    "typescript": "^4.7.4",
-    "use-media": "^1.4.0",
-    "yarn-deduplicate": "^3.1.0"
+    "typescript": "^5.3.3",
+    "use-media": "^1.4.0"
   },
-  "version": "0.0.0"
+  "packageManager": "yarn@4.1.0"
 }
