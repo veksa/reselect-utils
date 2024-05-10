@@ -24,3 +24,5 @@ export { setDebugMode, isDebugMode, defaultKeySelector } from './helpers';
 
 /* Cache */
 export { initGarbageCollector, IntervalMapCache } from './cache/intervalMapCache';
+
+export { useSelector } from './_hooks/useSelector';
