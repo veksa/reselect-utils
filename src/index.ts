@@ -21,3 +21,6 @@ export { createKeySelectorCreator } from './createKeySelectorCreator';
 
 /* Configuration */
 export { setDebugMode, isDebugMode, defaultKeySelector } from './helpers';
+
+/* Cache */
+export { initGarbageCollector, IntervalMapCache } from './cache/intervalMapCache';

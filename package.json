@@ -1,6 +1,6 @@
 {
   "name": "@veksa/reselect-utils",
-  "version": "5.1.0-p1",
+  "version": "5.1.0-p2",
   "main": "./dist/cjs/reselectUtils.cjs",
   "module": "./dist/reselectUtils.legacy-esm.js",
   "types": "./dist/reselectUtils.d.ts",
