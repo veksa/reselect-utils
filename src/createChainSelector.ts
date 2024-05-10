@@ -44,13 +44,13 @@ const generateSelectorKey = (selector: unknown) => {
   return result;
 };
 
-export type CreateSelectorOptions = {
-  selectorCreator: typeof createSelectorCreator,
+export type CreateSelectorOptions<SelectorCreator extends typeof createSelectorCreator> = {
+  selectorCreator: ReturnType<SelectorCreator>;
   cacheObject: ICacheObject,
 }
 
-export type ChainSelectorOptions = {
-  createSelectorOptions?: () => CreateSelectorOptions;
+export type ChainSelectorOptions<SelectorCreator extends typeof createSelectorCreator = typeof createSelectorCreator> = {
+  createSelectorOptions?: () => CreateSelectorOptions<SelectorCreator>;
   keySelectorComposer?: KeySelectorComposer;
 };
 

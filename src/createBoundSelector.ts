@@ -21,6 +21,7 @@ import {
 import { isPropSelector } from './createPropSelector';
 import { excludeDefaultSelectors } from './createKeySelectorCreator';
 import { stringComposeKeySelectors } from './stringComposeKeySelectors';
+import { temporaryAssign } from './_helpers/temporaryAssign';
 
 const generateBindingName = <P extends object>(binding: P) => {
   const structure = Object.keys(binding).reduce(
@@ -69,7 +70,7 @@ const innerCreateBoundSelector = <S, P2, P1 extends Partial<P2>, R>(
   return boundSelector as BoundSelector<S, P2, P1, R>;
 };
 
-export const createBoundSelector = <
+const createBoundInnerSelector = <
   S,
   P2 extends object,
   P1 extends Partial<P2>,
@@ -161,4 +162,17 @@ export const createBoundSelector = <
   }
 
   return boundSelector;
+};
+
+export const createBoundSelector: typeof createBoundInnerSelector = (baseSelector, binding) => {
+  return createBoundInnerSelector(baseSelector, binding, {
+    bindingStrategy: (selector, bindingProps) => {
+      return (state, props) => {
+        const {result: nextProps, rollback} = temporaryAssign(props, bindingProps as Record<string, unknown>);
+        const result = selector(state, nextProps as Parameters<typeof baseSelector>[1]);
+        rollback();
+        return result;
+      };
+    },
+  });
 };
