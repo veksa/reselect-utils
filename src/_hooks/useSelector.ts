@@ -1,4 +1,4 @@
-import { shallowEqual, useSelector as useReduxSelector } from 'react-redux';
+import { shallowEqual, useSelector as useReduxSelector } from '@veksa/react-redux';
 import { useMemoWith } from './useMemoWith';
 import { useCallback, useMemo } from 'react';
 

@@ -1,25 +1,25 @@
 {
   "name": "@veksa/reselect-utils",
-  "version": "5.1.0-p6",
-  "packageManager": "yarn@4.1.0",
-  "main": "./dist/cjs/reselectUtils.cjs",
-  "types": "./dist/reselectUtils.d.mts",
+  "version": "5.1.0-p12",
+  "packageManager": "yarn@4.7.0",
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/reselectUtils.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/reselectUtils.d.mts",
+      "types": "./dist/reselectUtils.d.ts",
       "import": "./dist/reselectUtils.mjs",
-      "default": "./dist/cjs/reselectUtils.cjs"
+      "default": "./dist/cjs/index.js"
     }
   },
   "files": [
+    "src",
     "dist"
   ],
   "scripts": {
-    "build": "npm run clean && tsup",
+    "build": "yarn clean && tsup",
     "test": "jest",
-    "lint": "eslint --ext .js,.ts,.tsx .",
-    "format": "prettier --write **/*.{js,ts,tsx,json,md}",
+    "lint": "eslint src/",
     "compile": "tsc --noEmit",
     "clean": "rimraf lib es dist"
   },
@@ -27,56 +27,41 @@
     "**/*.{js,ts,tsx}": [
       "yarn lint --cache --fix",
       "yarn test --bail --findRelatedTests"
-    ],
-    "**/*.{json,md}": [
-      "yarn format"
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.24.5",
-    "@types/enzyme": "^3.10.8",
-    "@types/enzyme-adapter-react-16": "^1.0.6",
-    "@types/jest": "^29.5.11",
-    "@types/react": "^18.3.1",
-    "@types/react-dom": "^18.3.0",
-    "@types/shelljs": "^0.8.11",
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
-    "@veksa/re-reselect": "^5.1.0-p1",
-    "@veksa/reselect": "^5.1.0-p1",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.5",
-    "enzyme-to-json": "^3.6.1",
-    "eslint": "^8.55.0",
-    "eslint-config-airbnb-typescript": "^17.1.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.0",
-    "eslint-plugin-jsx-a11y": "^6.8.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^4.3.6",
+    "@types/jest": "^29.5.13",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "@veksa/re-reselect": "^5.1.1-p5",
+    "@veksa/react-redux": "^9.2.0-p5",
+    "@veksa/reselect": "^5.1.1-p5",
+    "eslint": "^8.0.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-typescript": "^18.0.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "lint-staged": "^10.5.3",
-    "prettier": "^2.2.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-redux": "^9.1.2",
-    "rimraf": "^5.0.5",
-    "shelljs": "^0.8.5",
-    "ts-jest": "^29.1.2",
+    "lint-staged": "^15.2.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "tslib": "^2.6.2",
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5",
-    "use-media": "^1.5.0"
+    "tslib": "^2.8.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2"
   },
   "peerDependencies": {
-    "@veksa/re-reselect": "^5.1.0-p1",
-    "@veksa/reselect": "^5.1.0-p1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-redux": "^9.1.2"
+    "@veksa/re-reselect": "^5.1.1-p5",
+    "@veksa/react-redux": "^9.2.0-p5",
+    "@veksa/reselect": "^5.1.1-p5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

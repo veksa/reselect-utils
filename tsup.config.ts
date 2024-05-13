@@ -1,31 +1,74 @@
-import { defineConfig, Options } from 'tsup';
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import type { Options } from 'tsup'
+import { defineConfig } from 'tsup'
 
-export default defineConfig(options => {
-  const commonOptions: Partial<Options> = {
+async function writeCommonJSEntry() {
+  await fs.writeFile(
+    path.join('dist/cjs/', 'index.js'),
+    `'use strict'
+if (process.env.NODE_ENV === 'production') {
+  module.exports = require('./reselectUtils.production.min.cjs')
+} else {
+  module.exports = require('./reselectUtils.development.cjs')
+}`
+  )
+}
+
+export default defineConfig((options): Options[] => {
+  const commonOptions: Options = {
     entry: {
-      reselectUtils: 'src/index.ts',
+      reselectUtils: 'src/index.ts'
     },
     sourcemap: true,
-    ...options,
-  };
+    target: ['esnext'],
+    clean: true,
+    ...options
+  }
 
   return [
-    // Modern ESM
     {
       ...commonOptions,
+      name: 'Modern ESM',
+      target: ['es2019'],
       format: ['esm'],
-      external: ['react', 'react-dom'],
-      target: 'es2019',
-      outExtension: () => ({ js: '.mjs' }),
-      dts: true,
-      clean: true,
+      outExtension: () => ({ js: '.mjs' })
     },
     {
       ...commonOptions,
-      format: 'cjs',
-      external: ['react', 'react-dom'],
+      name: 'CJS Development',
+      entry: {
+        'reselectUtils.development': 'src/index.ts'
+      },
+      env: {
+        NODE_ENV: 'development'
+      },
+      format: ['cjs'],
+      outDir: './dist/cjs/',
+      outExtension: () => ({ js: '.cjs' })
+    },
+    {
+      ...commonOptions,
+      name: 'CJS production',
+      entry: {
+        'reselectUtils.production.min': 'src/index.ts'
+      },
+      env: {
+        NODE_ENV: 'production'
+      },
+      format: ['cjs'],
       outDir: './dist/cjs/',
       outExtension: () => ({ js: '.cjs' }),
+      minify: true,
+      onSuccess: async () => {
+        await writeCommonJSEntry()
+      }
     },
-  ];
-});
+    {
+      ...commonOptions,
+      name: 'CJS Type Definitions',
+      format: ['cjs'],
+      dts: { only: true }
+    }
+  ]
+})
