@@ -1,6 +1,6 @@
 {
   "name": "@veksa/reselect-utils",
-  "version": "5.1.0-p8",
+  "version": "5.1.0-p9",
   "packageManager": "yarn@4.1.0",
   "main": "./dist/cjs/reselectUtils.cjs",
   "types": "./dist/reselectUtils.d.mts",
