@@ -1509,18 +1509,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veksa/re-reselect@npm:^5.1.1-p2":
-  version: 5.1.1-p2
-  resolution: "@veksa/re-reselect@npm:5.1.1-p2"
+"@veksa/re-reselect@npm:^5.1.1-p3":
+  version: 5.1.1-p3
+  resolution: "@veksa/re-reselect@npm:5.1.1-p3"
   peerDependencies:
-    "@veksa/reselect": ^5.1.1-p2
-  checksum: 10/01f688ce8e21e45528808acc3f68c426bcd4b5701efb926a530f9e6a1ca01a268382eaa1f83c2a2d926a80da167c83afa76cd197921aa5f1924cc1a183f5c8bd
+    "@veksa/reselect": ^5.1.1-p3
+  checksum: 10/472c27024082354c817c0424b4f768fab0906670cd66e6529e8f5cbc6a6d4a403bc52ce6bc1331704deb3466c778db77649e11f2ca72618df34bd8c99b54226e
   languageName: node
   linkType: hard
 
-"@veksa/react-redux@npm:^9.1.3-p2":
-  version: 9.1.3-p2
-  resolution: "@veksa/react-redux@npm:9.1.3-p2"
+"@veksa/react-redux@npm:^9.1.3-p3":
+  version: 9.1.3-p3
+  resolution: "@veksa/react-redux@npm:9.1.3-p3"
   dependencies:
     uuid: "npm:^10.0.0"
   peerDependencies:
@@ -1532,7 +1532,7 @@ __metadata:
       optional: true
     redux:
       optional: true
-  checksum: 10/695d759ac7d6750b135fe042188b798a89eef79227f9e8944ffc857a705c790b6562de00d27b8b75f18695367e8a20665f3c9643f163642e8acdf0f94ea92965
+  checksum: 10/ae011353ddce293c03a6e22c58cfd04f5b4cda7ba0566dbefa87f2ae28629a90db94c9a315653536f35829b30f7520b72dbd977a1daa3fa38ccdc8cd07970efa
   languageName: node
   linkType: hard
 
@@ -1545,9 +1545,9 @@ __metadata:
     "@types/react-dom": "npm:^18.3.0"
     "@typescript-eslint/eslint-plugin": "npm:^8.7.0"
     "@typescript-eslint/parser": "npm:^8.7.0"
-    "@veksa/re-reselect": "npm:^5.1.1-p2"
-    "@veksa/react-redux": "npm:^9.1.3-p2"
-    "@veksa/reselect": "npm:^5.1.1-p2"
+    "@veksa/re-reselect": "npm:^5.1.1-p3"
+    "@veksa/react-redux": "npm:^9.1.3-p3"
+    "@veksa/reselect": "npm:^5.1.1-p3"
     eslint: "npm:^8.0.1"
     eslint-config-airbnb: "npm:^19.0.4"
     eslint-config-airbnb-typescript: "npm:^18.0.0"
@@ -1567,18 +1567,18 @@ __metadata:
     tsup: "npm:^8.3.0"
     typescript: "npm:^5.6.2"
   peerDependencies:
-    "@veksa/re-reselect": ^5.1.1-p2
-    "@veksa/react-redux": ^9.1.3-p2
-    "@veksa/reselect": ^5.1.1-p2
+    "@veksa/re-reselect": ^5.1.1-p3
+    "@veksa/react-redux": ^9.1.3-p3
+    "@veksa/reselect": ^5.1.1-p3
     react: ^18.3.1
     react-dom: ^18.3.1
   languageName: unknown
   linkType: soft
 
-"@veksa/reselect@npm:^5.1.1-p2":
-  version: 5.1.1-p2
-  resolution: "@veksa/reselect@npm:5.1.1-p2"
-  checksum: 10/59fedf66e45397762cde933ff173e2cc89fec42e3c15eb70020099644bfca1b6d758da2f7b34228190a8af34d8ecbe780f025348829a7e67def38f0a53bc92d4
+"@veksa/reselect@npm:^5.1.1-p3":
+  version: 5.1.1-p3
+  resolution: "@veksa/reselect@npm:5.1.1-p3"
+  checksum: 10/5502d79be0d9e751434b48430edae8615eaa057cc6bb3ce1dda9739a92a4bba567357b100de4496cc26572c82d2108aa49013d8441d956eb05fe5223277ba6a5
   languageName: node
   linkType: hard
 
