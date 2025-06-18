@@ -1349,12 +1349,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
-  version: 20.11.16
-  resolution: "@types/node@npm:20.11.16"
+"@types/node@npm:*, @types/node@npm:^24.0.3":
+  version: 24.0.3
+  resolution: "@types/node@npm:24.0.3"
   dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10/751f50ec5c9332b11515e82fe37c71479ac4449b711280aa3c7910edf67b1e3f5ac00041512add543f9a892096a68356406998bf02a2c809a73d176c44c28414
+    undici-types: "npm:~7.8.0"
+  checksum: 10/6cce0afa9b0ff7f8eab7cb0339909c1e4ef480b824b8de5adc9cee05dac63ee3d8c7a46e1f95f13ecc94e84608118741f9949527a92fbf3f0e1f7714b37a7b61
   languageName: node
   linkType: hard
 
@@ -1529,18 +1529,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@veksa/re-reselect@npm:^5.1.1-p5":
-  version: 5.1.1-p5
-  resolution: "@veksa/re-reselect@npm:5.1.1-p5"
+"@veksa/re-reselect@npm:^5.1.1-p8":
+  version: 5.1.1-p8
+  resolution: "@veksa/re-reselect@npm:5.1.1-p8"
   peerDependencies:
-    "@veksa/reselect": ^5.1.1-p4
-  checksum: 10/8e66e09ad1f4984dcb91a222cb575f07910c894f2f3629e52183251f3d4a12508edc35779fc683276e638fb7bfb2ff7a65e4266c13cde639bd9594d6996952d1
+    "@veksa/reselect": ^5.1.1-p7
+  checksum: 10/c13fffc31a8f2e1a821710cf61b61b44c2b5987f38727ecd589e1e7f4a88073fd981ffb2e59905b36ff91313d17897f64203619fcef172c2e3694b8b919021a4
   languageName: node
   linkType: hard
 
-"@veksa/react-redux@npm:^9.2.0-p5":
-  version: 9.2.0-p5
-  resolution: "@veksa/react-redux@npm:9.2.0-p5"
+"@veksa/react-redux@npm:^9.2.0-p7":
+  version: 9.2.0-p7
+  resolution: "@veksa/react-redux@npm:9.2.0-p7"
   peerDependencies:
     "@types/react": ^18.3 || ^19
     react: ^18.3 || ^19
@@ -1551,7 +1551,7 @@ __metadata:
       optional: true
     redux:
       optional: true
-  checksum: 10/26c1721c5ee03241e1cfcad98caae14512eebb3cdf0f1ad82e4643593c25a48d47cedf0b0f2e7fc9b796fb9606b3f313907ece5f308acfea9ec26f5090945b5f
+  checksum: 10/e2a48eacf5a5e398ccb7f994bf3ea3ac6bd9e892e9bf44e5e9619e0a029369d0e1aaf8733dced710f1e9c137ea391e0a59abb44fd75cc5ad5d984783ea5b6d81
   languageName: node
   linkType: hard
 
@@ -1560,13 +1560,14 @@ __metadata:
   resolution: "@veksa/reselect-utils@workspace:."
   dependencies:
     "@types/jest": "npm:^29.5.13"
+    "@types/node": "npm:^24.0.3"
     "@types/react": "npm:^19.0.12"
     "@types/react-dom": "npm:^19.0.4"
     "@typescript-eslint/eslint-plugin": "npm:^8.7.0"
     "@typescript-eslint/parser": "npm:^8.7.0"
-    "@veksa/re-reselect": "npm:^5.1.1-p5"
-    "@veksa/react-redux": "npm:^9.2.0-p5"
-    "@veksa/reselect": "npm:^5.1.1-p5"
+    "@veksa/re-reselect": "npm:^5.1.1-p8"
+    "@veksa/react-redux": "npm:^9.2.0-p7"
+    "@veksa/reselect": "npm:^5.1.1-p7"
     eslint: "npm:^8.0.1"
     eslint-config-airbnb: "npm:^19.0.4"
     eslint-config-airbnb-typescript: "npm:^18.0.0"
@@ -1586,18 +1587,18 @@ __metadata:
     tsup: "npm:^8.4.0"
     typescript: "npm:^5.8.2"
   peerDependencies:
-    "@veksa/re-reselect": ^5.1.1-p5
-    "@veksa/react-redux": ^9.2.0-p5
-    "@veksa/reselect": ^5.1.1-p5
+    "@veksa/re-reselect": ^5.1.1-p8
+    "@veksa/react-redux": ^9.2.0-p7
+    "@veksa/reselect": ^5.1.1-p7
     react: ^19.0.0
     react-dom: ^19.0.0
   languageName: unknown
   linkType: soft
 
-"@veksa/reselect@npm:^5.1.1-p5":
-  version: 5.1.1-p5
-  resolution: "@veksa/reselect@npm:5.1.1-p5"
-  checksum: 10/0ddb5c40adb565b0462f4b423c445fac97c76631da34e3f66574d6d4c778eae0fbefeb7226daf3005ffa6308539f368523750eae8417886ac91c74e21ebf4fd4
+"@veksa/reselect@npm:^5.1.1-p7":
+  version: 5.1.1-p7
+  resolution: "@veksa/reselect@npm:5.1.1-p7"
+  checksum: 10/584ea655afab1e0503c6bd2c078738b5f1ea2fbf6bd35ddaff70107bff506f7040f21592dafc6125db67493db5a519ed4fb3183b30075beaa22b5417e6c308f4
   languageName: node
   linkType: hard
 
@@ -7237,10 +7238,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~5.26.4":
-  version: 5.26.5
-  resolution: "undici-types@npm:5.26.5"
-  checksum: 10/0097779d94bc0fd26f0418b3a05472410408877279141ded2bd449167be1aed7ea5b76f756562cb3586a07f251b90799bab22d9019ceba49c037c76445f7cddd
+"undici-types@npm:~7.8.0":
+  version: 7.8.0
+  resolution: "undici-types@npm:7.8.0"
+  checksum: 10/fcff3fbab234f067fbd69e374ee2c198ba74c364ceaf6d93db7ca267e784457b5518cd01d0d2329b075f412574205ea3172a9a675facb49b4c9efb7141cd80b7
   languageName: node
   linkType: hard
 

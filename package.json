@@ -1,7 +1,7 @@
 {
   "name": "@veksa/reselect-utils",
-  "version": "5.1.0-p12",
-  "packageManager": "yarn@4.7.0",
+  "version": "5.1.0-p13",
+  "packageManager": "yarn@4.9.2",
   "main": "./dist/cjs/index.js",
   "types": "./dist/reselectUtils.d.ts",
   "exports": {
@@ -31,13 +31,14 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",
+    "@types/node": "^24.0.3",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
-    "@veksa/re-reselect": "^5.1.1-p5",
-    "@veksa/react-redux": "^9.2.0-p5",
-    "@veksa/reselect": "^5.1.1-p5",
+    "@veksa/re-reselect": "^5.1.1-p8",
+    "@veksa/react-redux": "^9.2.0-p7",
+    "@veksa/reselect": "^5.1.1-p7",
     "eslint": "^8.0.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^18.0.0",
@@ -58,9 +59,9 @@
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
-    "@veksa/re-reselect": "^5.1.1-p5",
-    "@veksa/react-redux": "^9.2.0-p5",
-    "@veksa/reselect": "^5.1.1-p5",
+    "@veksa/re-reselect": "^5.1.1-p8",
+    "@veksa/react-redux": "^9.2.0-p7",
+    "@veksa/reselect": "^5.1.1-p7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   }
