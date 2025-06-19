@@ -97,25 +97,106 @@ const address = getUserAddressByUserId(state, '123');
 import { createPathSelector } from '@veksa/reselect-utils';
 
 // Clean path selection with built-in null handling
-const getUserAddress = createPathSelector(
-  (state) => state.user, 
-  (user) => user.contact?.address
+const getUser = createPathSelector(
+  (state) => state.user,
 );
 
 // For parametric selectors
-const getUserAddressByUserId = createPathSelector(
+const getUserByUserId = createPathSelector(
   (state, userId) => state.users?.[userId],
-  (user) => user?.contact?.address
 );
 
 // Usage:
-const address = getUserAddress(state);  // Safely returns undefined if path is broken
-const userAddress = getUserAddressByUserId(state, '123');  // With parameters
+const address = getUser(state).address();  // Safely returns undefined if path is broken
+const userAddress = getUserByUserId(state, '123').address();  // With parameters
 ```
 
 @veksa/reselect-utils provides safer property access with path selectors that handle null/undefined values automatically.
 
 ### Basic Usage Patterns
+
+#### Segment Selector
+
+```typescript
+import { createSegmentSelector } from '@veksa/reselect-utils';
+
+interface IUserStore {
+  address: string;
+}
+
+interface IUserSegment {
+  user: IUserStore;
+}
+
+const defaultUser: IUserStore = {address: 'Default address'};
+
+const getUserSegment = createSegmentSelector<IUserSegment, IUserStore>(state => state.user, defaultUser);
+```
+
+#### Path Selector
+
+```typescript
+import { createPathSelector } from '@veksa/reselect-utils';
+
+const state = {
+  user: {
+    address: 'Some user address',
+  },
+};
+
+const getUserAddress = createPathSelector(state => state.user).address();
+```
+
+#### Prop Selector
+
+```typescript
+import { createPropSelector } from '@veksa/reselect-utils';
+
+const getUserIdFromProps = createPropSelector<{userId: number}>().userId();
+```
+
+#### Bound Selector
+
+```typescript
+import { createSelector } from '@veksa/reselect';
+import { createBoundSelector } from '@veksa/reselect-utils';
+
+const getUserByName = createSelector(
+  state => state.users,
+  (state, props) => props.userName,
+  (users, userName) => users[userName],
+);
+
+const getAdmin = createBoundSelector(
+  getUserByName,
+  {userName: 'admin'},
+);
+
+// Usage:
+const admin = getAdmin(state); // Same as getUserByName(state, {userName: 'admin'})
+```
+
+#### Adapted Selector
+
+```typescript
+import { createSelector } from '@veksa/reselect';
+import { createAdaptedSelector } from '@veksa/reselect-utils';
+
+const getUserByNameAndRole = createSelector(
+  state => state.users,
+  (state, props) => props.userName,
+  (state, props) => props.userRole,
+  (users, userName, userRole) => users[userName][userRole],
+);
+
+const getAdmin = createAdaptedSelector(
+  getUserByNameAndRole,
+  props => ({userName: props.userName, userRole: 'admin'}),
+);
+
+// Usage:
+const admin = getAdmin(state); // Same as getUserByName(state, {userName: 'admin'})
+```
 
 #### Chain Selectors
 
@@ -133,44 +214,6 @@ const getActiveUserEmails = createChainSelector(getUserData)
 
 // Usage:
 const activeEmails = getActiveUserEmails(state); // ['alice@example.com', 'bob@example.com']
-```
-
-#### Path Selectors for Safe Object Access
-
-```typescript
-import { createPathSelector } from '@veksa/reselect-utils';
-
-// Safe access to deeply nested properties
-const getUserCity = createPathSelector(
-  state => state.currentUser,
-  user => user?.contact?.address?.city
-);
-
-// Usage:
-const city = getUserCity(state); // Returns city or undefined if any part of the path is null/undefined
-```
-
-#### Bound Selectors for Partial Application
-
-```typescript
-import { createSelector } from '@veksa/reselect';
-import { createBoundSelector } from '@veksa/reselect-utils';
-
-// Original parametric selector
-const getUsersByRole = createSelector(
-  state => state.users,
-  (state, role) => role,
-  (users, role) => users.filter(user => user.role === role)
-);
-
-// Create a bound selector with predefined role
-const getAdmins = createBoundSelector(
-  getUsersByRole,
-  (state) => ['admin'] // Arguments to pass to original selector
-);
-
-// Usage:
-const admins = getAdmins(state); // Same as getUsersByRole(state, 'admin')
 ```
 
 ## Advanced Examples
@@ -226,6 +269,68 @@ createChainSelector(baseSelector)
   .build();
 ```
 
+##### ChainSelector Methods
+
+###### chain
+Transforms the output of the previous selector by creating a new selector based on its result. This is where the real power of chain selectors comes in, allowing composition of selectors where the output of one becomes the context for creating the next.
+
+```typescript
+chain<S2, R2>(fn: (result: R1) => Selector<S2, R2>, options?: ChainSelectorOptions): SelectorMonad
+chain<S2, P2, R2>(fn: (result: R1) => ParametricSelector<S2, P2, R2>, options?: ChainSelectorOptions): SelectorMonad
+```
+
+- **fn** - Function that receives the previous selector's result and returns a new selector
+- **options** - Optional configuration for caching and key selection
+
+**Examples:**
+
+```typescript
+// Basic chaining - transform one selector's result into another selector
+const userWithDetails = createChainSelector(state => state.users)
+  .chain(users => (state) => {
+    // This function receives the users result and returns a new selector
+    const userIds = Object.keys(users);
+    return userIds.map(id => state.userDetails[id]);
+  })
+  .build();
+
+// Parametric selectors with chain
+const getUserPostsById = createChainSelector(propSelector)
+  .chain(props => {
+    // Use the props to create a targeted selector
+    return createSelector(
+      state => state.users[props.userId],
+      state => state.posts,
+      (user, posts) => posts.filter(post => post.authorId === user.id)
+    );
+  })
+  .build();
+
+// Multiple chains
+const getUserStats = createChainSelector(state => state.users)
+  .chain(users => state => Object.values(users).filter(user => user.active))
+  .chain(activeUsers => state => ({
+    activeCount: activeUsers.length,
+    totalCount: Object.keys(state.users).length,
+    activeRatio: activeUsers.length / Object.keys(state.users).length
+  }))
+  .build();
+```
+
+###### map
+Transforms the output of the selector with a simple transformation function. Unlike `chain`, `map` doesn't create a new selector but just transforms the result of the current one.
+
+```typescript
+map<R2>(fn: (result: R1) => R2, options?: ChainSelectorOptions): SelectorMonad
+```
+
+###### build
+Completes the chain and returns the final selector function that can be used in components.
+
+```typescript
+build(): Selector | ParametricSelector
+```
+
 #### createPathSelector
 Creates a selector that safely accesses nested properties.
 
@@ -252,6 +357,53 @@ Creates a structured selector with caching support.
 
 ```typescript
 createCachedStructuredSelector(selectors)(keySelector);
+```
+
+#### createEmptySelector
+Creates a selector that always returns `undefined` regardless of input. Useful as a placeholder or for conditional selection logic.
+
+```typescript
+const emptySelector = createEmptySelector(baseSelector);
+// Always returns undefined while maintaining the original selector's signature
+```
+
+#### createPropSelector
+Creates a selector that returns the props passed to it, enabling strongly-typed access to props in selector chains.
+
+```typescript
+const propSelector = createPropSelector();
+// Usage: propSelector(state, props) returns props
+
+// In a chain
+const userByIdSelector = createChainSelector(propSelector)
+  .chain((props) => createPathSelector(
+    (state) => state.users[props.userId],
+    (user) => user
+  ))
+  .build();
+```
+
+#### createSegmentSelector
+Creates a selector with a default/initial value when the selection returns null or undefined.
+
+```typescript
+const getUserSettings = createSegmentSelector(
+  (state) => state.userSettings,
+  { theme: 'light', notifications: true } // Default value if userSettings is null/undefined
+);
+```
+
+#### createSequenceSelector
+Creates a selector that returns an array of results from multiple selectors.
+
+```typescript
+const getUserStats = createSequenceSelector([
+  (state) => state.user.postsCount,
+  (state) => state.user.followersCount,
+  (state) => state.user.likesCount
+]);
+
+// Returns [postsCount, followersCount, likesCount]
 ```
 
 ### Cache Objects
