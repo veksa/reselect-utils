@@ -1,19 +1,17 @@
-import { Selector, ParametricSelector } from '@veksa/re-reselect';
-import { NamedSelector, NamedParametricSelector, Path } from './types';
-import {
-  defineDynamicSelectorName,
-  getSelectorName,
-  isDebugMode,
-  isObject,
-} from './helpers';
+import { ParametricSelector, Selector } from '@veksa/re-reselect';
+import { NamedParametricSelector, NamedSelector, Path } from './types';
+import { isObject } from './_helpers/isObject';
+import { isDebugMode } from './debug/debug';
+import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
+import { getSelectorName } from './_helpers/getSelectorName';
 
 export type Defined<T> = Exclude<T, undefined>;
 
 export type IsOptional<T> = undefined extends T
   ? true
   : null extends T
-  ? true
-  : false;
+    ? true
+    : false;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type IsObject<T> = T extends object ? true : false;
@@ -126,14 +124,14 @@ export type OptionalArrayParametricSelectorWrapper<S, P, R, D> = {
 export type RequiredDataSelectorWrapper<S, R, D> = R extends unknown[]
   ? RequiredArraySelectorWrapper<S, R[number], D>
   : IsObject<R> extends true
-  ? RequiredObjectSelectorWrapper<S, R, D>
-  : RequiredSelectorBuilder<S, R, D>;
+    ? RequiredObjectSelectorWrapper<S, R, D>
+    : RequiredSelectorBuilder<S, R, D>;
 
 export type OptionalDataSelectorWrapper<S, R, D> = R extends unknown[]
   ? OptionalArraySelectorWrapper<S, R[number], D>
   : IsObject<R> extends true
-  ? OptionalObjectSelectorWrapper<S, R, D>
-  : OptionalSelectorBuilder<S, R, D>;
+    ? OptionalObjectSelectorWrapper<S, R, D>
+    : OptionalSelectorBuilder<S, R, D>;
 
 export type RequiredDataParametricSelectorWrapper<
   S,
@@ -143,8 +141,8 @@ export type RequiredDataParametricSelectorWrapper<
 > = R extends unknown[]
   ? RequiredArrayParametricSelectorWrapper<S, P, R[number], D>
   : IsObject<R> extends true
-  ? RequiredObjectParametricSelectorWrapper<S, P, R, D>
-  : RequiredParametricSelectorBuilder<S, P, R, D>;
+    ? RequiredObjectParametricSelectorWrapper<S, P, R, D>
+    : RequiredParametricSelectorBuilder<S, P, R, D>;
 
 export type OptionalDataParametricSelectorWrapper<
   S,
@@ -154,8 +152,8 @@ export type OptionalDataParametricSelectorWrapper<
 > = R extends unknown[]
   ? OptionalArrayParametricSelectorWrapper<S, P, R[number], D>
   : IsObject<R> extends true
-  ? OptionalObjectParametricSelectorWrapper<S, P, R, D>
-  : OptionalParametricSelectorBuilder<S, P, R, D>;
+    ? OptionalObjectParametricSelectorWrapper<S, P, R, D>
+    : OptionalParametricSelectorBuilder<S, P, R, D>;
 
 export type RequiredPathSelectorType<S, R, D> = RequiredSelectorBuilder<
   S,
@@ -191,7 +189,8 @@ export type OptionalPathParametricSelectorType<
 export const innerCreatePathSelector = (
   baseSelector: (...args: unknown[]) => unknown,
   path: Path = [],
-  applyMeta: (selector: unknown) => void = () => {},
+  applyMeta: (selector: unknown) => void = () => {
+  },
 ): unknown => {
   const proxyTarget = (defaultValue?: unknown) => {
     function resultSelector() {

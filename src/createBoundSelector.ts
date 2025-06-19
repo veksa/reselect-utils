@@ -1,27 +1,18 @@
 import { ParametricSelector } from '@veksa/re-reselect';
-import {
-  CachedSelector,
-  NamedParametricSelector,
-  NamedSelector,
-} from './types';
-import {
-  getSelectorName,
-  isDebugMode,
-  isCachedSelector,
-  defineDynamicSelectorName,
-  defaultKeySelector,
-  isObject,
-  arePathsEqual,
-  getObjectPaths,
-} from './helpers';
-import {
-  isComposedKeySelector,
-  KeySelectorComposer,
-} from './createKeySelectorComposer';
+import { CachedSelector, NamedParametricSelector, NamedSelector } from './types';
+import { isComposedKeySelector, KeySelectorComposer } from './keys/createKeySelectorComposer';
 import { isPropSelector } from './createPropSelector';
-import { excludeDefaultSelectors } from './createKeySelectorCreator';
-import { stringComposeKeySelectors } from './stringComposeKeySelectors';
+import { excludeDefaultSelectors } from './keys/createKeySelectorCreator';
+import { stringComposeKeySelectors } from './keys/stringComposeKeySelectors';
 import { temporaryAssign } from './_helpers/temporaryAssign';
+import { isDebugMode } from './debug/debug';
+import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
+import { getSelectorName } from './_helpers/getSelectorName';
+import { isCachedSelector } from './_helpers/isCachedSelector';
+import { isObject } from './_helpers/isObject';
+import { getObjectPaths } from './_helpers/getObjectPaths';
+import { arePathsEqual } from './_helpers/arePathsEqual';
+import { defaultKeySelector } from './keys/defaultKeySelector';
 
 const generateBindingName = <P extends object>(binding: P) => {
   const structure = Object.keys(binding).reduce(
@@ -41,9 +32,9 @@ const generateBindingName = <P extends object>(binding: P) => {
  * The special type to prevent binding of non optional props on optional values
  */
 export type BoundSelector<S, P2, P1 extends Partial<P2>, R> = P2 extends Pick<
-  P1,
-  keyof P2
->
+    P1,
+    keyof P2
+  >
   ? Exclude<keyof P1, keyof P2> extends never
     ? NamedSelector<S, R>
     : NamedParametricSelector<S, Omit<P1, keyof P2>, R>
@@ -168,7 +159,7 @@ export const createBoundSelector: typeof createBoundInnerSelector = (baseSelecto
   return createBoundInnerSelector(baseSelector, binding, {
     bindingStrategy: (selector, bindingProps) => {
       return (state, props) => {
-        const {result: nextProps, rollback} = temporaryAssign(props, bindingProps as Record<string, unknown>);
+        const { result: nextProps, rollback } = temporaryAssign(props, bindingProps as Record<string, unknown>);
         const result = selector(state, nextProps as Parameters<typeof baseSelector>[1]);
         rollback();
         return result;

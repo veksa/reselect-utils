@@ -1,11 +1,9 @@
 import { ParametricSelector } from '@veksa/re-reselect';
 import { CachedSelector, NamedParametricSelector } from './types';
-import {
-  getSelectorName,
-  isDebugMode,
-  isCachedSelector,
-  defineDynamicSelectorName,
-} from './helpers';
+import { isDebugMode } from './debug/debug';
+import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
+import { getSelectorName } from './_helpers/getSelectorName';
+import { isCachedSelector } from './_helpers/isCachedSelector';
 
 const generateMappingName = <P1 extends object, P2>(mapping: (props: P2) => P1) => {
   if (mapping.name) {

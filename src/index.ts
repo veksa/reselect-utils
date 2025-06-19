@@ -10,19 +10,17 @@ export { createChainSelector, ChainSelectorOptions } from './createChainSelector
 export { createCachedSequenceSelector } from './createCachedSequenceSelector';
 export { createCachedStructuredSelector } from './createCachedStructuredSelector';
 
-/* Caches */
-export { TreeCache } from './TreeCache';
-
 /* Key Selector Composition */
-export { createKeySelectorComposer } from './createKeySelectorComposer';
-export { stringComposeKeySelectors } from './stringComposeKeySelectors';
-export { arrayComposeKeySelectors } from './arrayComposeKeySelectors';
-export { createKeySelectorCreator } from './createKeySelectorCreator';
+export { defaultKeySelector } from './keys/defaultKeySelector';
+export { createKeySelectorComposer } from './keys/createKeySelectorComposer';
+export { stringComposeKeySelectors } from './keys/stringComposeKeySelectors';
+export { arrayComposeKeySelectors } from './keys/arrayComposeKeySelectors';
+export { createKeySelectorCreator } from './keys/createKeySelectorCreator';
 
-/* Configuration */
-export { setDebugMode, isDebugMode, defaultKeySelector } from './helpers';
+export { setDebugMode, isDebugMode } from './debug/debug';
 
 /* Cache */
 export { initGarbageCollector, IntervalMapCache } from './cache/intervalMapCache';
+export { TreeCache } from './cache/TreeCache';
 
 export { useSelector } from './_hooks/useSelector';

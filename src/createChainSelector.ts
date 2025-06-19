@@ -1,21 +1,14 @@
-import {
-  Selector,
-  ParametricSelector,
-  createCachedSelector,
-  ICacheObject,
-} from '@veksa/re-reselect';
-import { NamedSelector, NamedParametricSelector } from './types';
-import {
-  defineDynamicSelectorName,
-  getSelectorName,
-  isDebugMode,
-  isCachedSelector,
-  defaultKeySelector,
-} from './helpers';
-import { createKeySelectorCreator } from './createKeySelectorCreator';
-import { KeySelectorComposer } from './createKeySelectorComposer';
-import { stringComposeKeySelectors } from './stringComposeKeySelectors';
-import {createSelectorCreator} from '@veksa/reselect';
+import { createCachedSelector, ICacheObject, ParametricSelector, Selector } from '@veksa/re-reselect';
+import { NamedParametricSelector, NamedSelector } from './types';
+import { createKeySelectorCreator } from './keys/createKeySelectorCreator';
+import { KeySelectorComposer } from './keys/createKeySelectorComposer';
+import { stringComposeKeySelectors } from './keys/stringComposeKeySelectors';
+import { createSelectorCreator } from '@veksa/reselect';
+import { isCachedSelector } from './_helpers/isCachedSelector';
+import { defaultKeySelector } from './keys/defaultKeySelector';
+import { isDebugMode } from './debug/debug';
+import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
+import { getSelectorName } from './_helpers/getSelectorName';
 
 const sumString = (source: unknown) => {
   const stringSource = String(source);
@@ -96,50 +89,50 @@ export class SelectorMonad<
     options?: ChainSelectorOptions,
   ): SelectorType extends Selector<S1, R1>
     ? SelectorMonad<
-        S1 & S2,
-        void,
-        R2,
-        NamedSelector<S1 & S2, R2>,
-        SelectorChainHierarchy<
-          (result: R1) => Selector<S2, R2>,
-          SelectorChainType
-        >
+      S1 & S2,
+      void,
+      R2,
+      NamedSelector<S1 & S2, R2>,
+      SelectorChainHierarchy<
+        (result: R1) => Selector<S2, R2>,
+        SelectorChainType
       >
+    >
     : SelectorMonad<
-        S1 & S2,
-        P1,
-        R2,
-        NamedParametricSelector<S1 & S2, P1, R2>,
-        SelectorChainHierarchy<
-          (result: R1) => Selector<S2, R2>,
-          SelectorChainType
-        >
-      >;
+      S1 & S2,
+      P1,
+      R2,
+      NamedParametricSelector<S1 & S2, P1, R2>,
+      SelectorChainHierarchy<
+        (result: R1) => Selector<S2, R2>,
+        SelectorChainType
+      >
+    >;
 
   public chain<S2, P2, R2>(
     fn: (result: R1) => ParametricSelector<S2, P2, R2>,
     options?: ChainSelectorOptions,
   ): SelectorType extends Selector<S1, R1>
     ? SelectorMonad<
-        S1 & S2,
-        P2,
-        R2,
-        NamedParametricSelector<S1 & S2, P2, R2>,
-        SelectorChainHierarchy<
-          (result: R1) => ParametricSelector<S2, P2, R2>,
-          SelectorChainType
-        >
+      S1 & S2,
+      P2,
+      R2,
+      NamedParametricSelector<S1 & S2, P2, R2>,
+      SelectorChainHierarchy<
+        (result: R1) => ParametricSelector<S2, P2, R2>,
+        SelectorChainType
       >
+    >
     : SelectorMonad<
-        S1 & S2,
-        P1 & P2,
-        R2,
-        NamedParametricSelector<S1 & S2, P1 & P2, R2>,
-        SelectorChainHierarchy<
-          (result: R1) => ParametricSelector<S2, P2, R2>,
-          SelectorChainType
-        >
-      >;
+      S1 & S2,
+      P1 & P2,
+      R2,
+      NamedParametricSelector<S1 & S2, P1 & P2, R2>,
+      SelectorChainHierarchy<
+        (result: R1) => ParametricSelector<S2, P2, R2>,
+        SelectorChainType
+      >
+    >;
 
   public chain<S2, P2, R2>(
     fn: SelectorChain<R1, S2, P2, R2>,
@@ -161,13 +154,13 @@ export class SelectorMonad<
 
     const keySelectorCreator = createKeySelectorCreator(keySelectorComposer);
 
-      const higherOrderSelector = createCachedSelector(
-          [this.selector],
-          fn,
-      )({
-          ...createSelectorOptions(),
-          keySelector,
-      });
+    const higherOrderSelector = createCachedSelector(
+      [this.selector],
+      fn,
+    )({
+      ...createSelectorOptions(),
+      keySelector,
+    });
 
     /* istanbul ignore else  */
     if (process.env.NODE_ENV !== 'production') {
@@ -222,7 +215,7 @@ export class SelectorMonad<
         return keySelectorCreator({
           inputSelectors: [higherOrderSelector, derivedSelector],
         });
-      }
+      },
     )({
       ...createSelectorOptions(),
       keySelector,

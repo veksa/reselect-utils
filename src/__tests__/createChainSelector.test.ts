@@ -6,12 +6,12 @@ import { createSequenceSelector } from '../createSequenceSelector';
 import { State, commonState } from '../__data__/state';
 import { createPathSelector } from '../createPathSelector';
 import { createPropSelector } from '../createPropSelector';
-import { createKeySelectorCreator } from '../createKeySelectorCreator';
+import { createKeySelectorCreator } from '../keys/createKeySelectorCreator';
 import { NamedParametricSelector, NamedSelector } from '../types';
-import { stringComposeKeySelectors } from '../stringComposeKeySelectors';
+import { stringComposeKeySelectors } from '../keys/stringComposeKeySelectors';
 
-jest.mock('../helpers', () => ({
-  ...jest.requireActual<object>('../helpers'),
+jest.mock('../debug/debug', () => ({
+  ...jest.requireActual<object>('../debug/debug'),
   isDebugMode: jest.fn(() => true),
 }));
 

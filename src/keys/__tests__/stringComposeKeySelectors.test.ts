@@ -1,5 +1,5 @@
 import { stringComposeKeySelectors } from '../stringComposeKeySelectors';
-import { createPropSelector } from '../createPropSelector';
+import { createPropSelector } from '../../createPropSelector';
 import { isComposedKeySelector } from '../createKeySelectorComposer';
 
 describe('stringComposeKeySelectors', () => {

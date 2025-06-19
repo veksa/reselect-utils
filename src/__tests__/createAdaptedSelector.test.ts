@@ -3,10 +3,10 @@ import { commonState, State } from '../__data__/state';
 import { createAdaptedSelector } from '../createAdaptedSelector';
 import { createStructuredSelector } from '../createStructuredSelector';
 import { NamedParametricSelector } from '../types';
-import {isCachedSelector} from '../helpers';
+import { isCachedSelector } from '../_helpers/isCachedSelector';
 
-jest.mock('../helpers', () => ({
-  ...jest.requireActual<object>('../helpers'),
+jest.mock('../debug/debug', () => ({
+  ...jest.requireActual<object>('../debug/debug'),
   isDebugMode: jest.fn(() => true),
 }));
 

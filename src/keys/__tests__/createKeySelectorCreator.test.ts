@@ -1,9 +1,9 @@
 import { createCachedSelector } from '@veksa/re-reselect';
-import { createPropSelector } from '../createPropSelector';
+import { createPropSelector } from '../../createPropSelector';
 import { createKeySelectorCreator } from '../createKeySelectorCreator';
-import { createPathSelector } from '../createPathSelector';
-import { createAdaptedSelector } from '../createAdaptedSelector';
-import { createChainSelector } from '../createChainSelector';
+import { createPathSelector } from '../../createPathSelector';
+import { createAdaptedSelector } from '../../createAdaptedSelector';
+import { createChainSelector } from '../../createChainSelector';
 import { stringComposeKeySelectors } from '../stringComposeKeySelectors';
 
 describe('createKeySelectorCreator', () => {

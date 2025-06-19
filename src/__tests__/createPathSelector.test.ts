@@ -1,7 +1,7 @@
 import { createCachedSelector } from '@veksa/re-reselect';
 import { createPathSelector } from '../createPathSelector';
-import { commonState, State, Document } from '../__data__/state';
-import { isCachedSelector } from '../helpers';
+import { commonState, Document, State } from '../__data__/state';
+import { isCachedSelector } from '../_helpers/isCachedSelector';
 
 describe('createPathSelector', () => {
   test('should implement basic access to state properties', () => {

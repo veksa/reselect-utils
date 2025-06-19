@@ -1,5 +1,5 @@
 import { arrayComposeKeySelectors } from '../arrayComposeKeySelectors';
-import { createPropSelector } from '../createPropSelector';
+import { createPropSelector } from '../../createPropSelector';
 import { isComposedKeySelector } from '../createKeySelectorComposer';
 
 describe('arrayComposeKeySelectors', () => {

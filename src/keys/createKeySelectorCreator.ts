@@ -1,10 +1,9 @@
 import { KeySelector, ParametricKeySelector } from '@veksa/re-reselect';
-import { isPropSelector } from './createPropSelector';
-import { arePathsEqual, defaultKeySelector, isCachedSelector } from './helpers';
-import {
-  isComposedKeySelector,
-  KeySelectorComposer,
-} from './createKeySelectorComposer';
+import { isPropSelector } from '../createPropSelector';
+import { isComposedKeySelector, KeySelectorComposer } from './createKeySelectorComposer';
+import { arePathsEqual } from '../_helpers/arePathsEqual';
+import { defaultKeySelector } from './defaultKeySelector';
+import { isCachedSelector } from '../_helpers/isCachedSelector';
 
 const areSelectorsEqual = (selector: unknown, another: unknown) => {
   if (selector === another) {
@@ -89,9 +88,9 @@ export function createKeySelectorCreator(
   keySelectorComposer: KeySelectorComposer,
 ) {
   return <S, P>({
-    inputSelectors,
-    keySelector,
-  }: {
+                  inputSelectors,
+                  keySelector,
+                }: {
     inputSelectors: unknown[];
     keySelector?: KeySelector<S> | ParametricKeySelector<S, P>;
   }) => {

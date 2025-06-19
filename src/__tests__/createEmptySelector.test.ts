@@ -2,7 +2,7 @@ import { createCachedSelector } from '@veksa/re-reselect';
 import { createChainSelector } from '../createChainSelector';
 import { createBoundSelector } from '../createBoundSelector';
 import { createEmptySelector } from '../createEmptySelector';
-import { isCachedSelector } from '../helpers';
+import { isCachedSelector } from '../_helpers/isCachedSelector';
 
 describe('createEmptySelector', () => {
   type Parent = {
@@ -41,8 +41,8 @@ describe('createEmptySelector', () => {
       .chain(({ parentId }) =>
         parentId !== undefined
           ? createBoundSelector(parentSelector, {
-              parentId,
-            })
+            parentId,
+          })
           : createEmptySelector(parentSelector),
       )
       .build();
