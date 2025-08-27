@@ -1,300 +1,192 @@
-import { createCachedSelector, ICacheObject, ParametricSelector, Selector } from '@veksa/re-reselect';
-import { NamedParametricSelector, NamedSelector } from './types';
-import { createKeySelectorCreator } from './keys/createKeySelectorCreator';
-import { KeySelectorComposer } from './keys/createKeySelectorComposer';
-import { stringComposeKeySelectors } from './keys/stringComposeKeySelectors';
-import { createSelectorCreator } from '@veksa/reselect';
-import { isCachedSelector } from './_helpers/isCachedSelector';
-import { defaultKeySelector } from './keys/defaultKeySelector';
-import { isDebugMode } from './debug/debug';
-import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
-import { getSelectorName } from './_helpers/getSelectorName';
+import {createCachedSelector, ICacheObject, KeySelector, ParametricSelector, Selector} from '@veksa/re-reselect';
+import {KeySelectorComposer} from './keys/createKeySelectorComposer';
+import {createSelectorCreator} from '@veksa/reselect';
+import {isCachedSelector} from './_helpers/isCachedSelector';
+import {defaultKeySelector} from './keys/defaultKeySelector';
+import {stringComposeKeySelectors} from "./keys/stringComposeKeySelectors";
+import {createKeySelectorCreator} from "./keys/createKeySelectorCreator";
+import {isDebugMode} from "./debug/debug";
+import {defineDynamicSelectorName} from "./_helpers/defineDynamicSelectorName";
+import {getSelectorName} from "./_helpers/getSelectorName";
+import {generateSelectorKey} from "./_helpers/generateSelectorKey";
+import {stringifyFunction} from "./_helpers/stringifyFunction";
 
-const sumString = (source: unknown) => {
-  const stringSource = String(source);
-  let result = 0;
+export type SelectorChain<R1, S, P, R2> = (result: R1) => Selector<S, R2> | ParametricSelector<S, P, R2>;
 
-  for (let i = stringSource.length - 1; i >= 0; i -= 1) {
-    const char = stringSource[i];
-
-    result += char.charCodeAt(0);
-  }
-
-  return result;
-};
-
-const generateSelectorKey = (selector: unknown) => {
-  const dependencies =
-    (selector as { dependencies?: unknown[] }).dependencies ?? [];
-  let result = sumString(selector);
-
-  for (let i = dependencies.length - 1; i >= 0; i -= 1) {
-    const dependency = dependencies[i];
-
-    result += sumString(dependency);
-  }
-
-  return result;
-};
+export type SelectorChainHierarchy<
+    C extends SelectorChain<any, any, any, any>,
+    H extends SelectorChainHierarchy<any, any>
+> = C & { parentChain?: H };
 
 export type CreateSelectorOptions<SelectorCreator extends typeof createSelectorCreator> = {
-  selectorCreator: ReturnType<SelectorCreator>;
-  cacheObject: ICacheObject,
+    selectorCreator: ReturnType<SelectorCreator>;
+    cacheObject: ICacheObject,
 }
 
 export type ChainSelectorOptions<SelectorCreator extends typeof createSelectorCreator = typeof createSelectorCreator> = {
-  createSelectorOptions?: () => CreateSelectorOptions<SelectorCreator>;
-  keySelectorComposer?: KeySelectorComposer;
+    createSelectorOptions?: () => CreateSelectorOptions<SelectorCreator>;
+    keySelectorComposer?: KeySelectorComposer;
 };
 
-export type SelectorChain<R1, S, P, R2> =
-  | ((result: R1) => Selector<S, R2>)
-  | ((result: R1) => ParametricSelector<S, P, R2>);
-
-export type SelectorChainHierarchy<
-  C extends SelectorChain<any, any, any, any>,
-  H extends SelectorChainHierarchy<any, any>
-> = C & { parentChain?: H };
-
-export type SelectorCreator<S, P, R1, R2> = (
-  selector: Selector<S, R1> | ParametricSelector<S, P, R1>,
-  combiner: (result: R1) => R2,
-) => Selector<S, R2> | ParametricSelector<S, P, R2>;
-
-export class SelectorMonad<
-  S1,
-  P1,
-  R1,
-  SelectorType extends Selector<S1, R1> | ParametricSelector<S1, P1, R1>,
-  SelectorChainType extends SelectorChainHierarchy<any, any>
-> {
-  private readonly selector: SelectorType;
-
-  private readonly options: ChainSelectorOptions;
-
-  private readonly prevChain?: SelectorChainType;
-
-  public constructor(
-    selector: SelectorType,
-    options: ChainSelectorOptions = {},
-    prevChain?: SelectorChainType,
-  ) {
-    this.selector = selector;
-    this.options = options;
-    this.prevChain = prevChain;
-  }
-
-  public chain<S2, R2>(
-    fn: (result: R1) => Selector<S2, R2>,
+export function createChainSelector<S1, P1, R1>(
+    selector: Selector<S1, R1> | ParametricSelector<S1, P1, R1>,
     options?: ChainSelectorOptions,
-  ): SelectorType extends Selector<S1, R1>
-    ? SelectorMonad<
-      S1 & S2,
-      void,
-      R2,
-      NamedSelector<S1 & S2, R2>,
-      SelectorChainHierarchy<
-        (result: R1) => Selector<S2, R2>,
-        SelectorChainType
-      >
-    >
-    : SelectorMonad<
-      S1 & S2,
-      P1,
-      R2,
-      NamedParametricSelector<S1 & S2, P1, R2>,
-      SelectorChainHierarchy<
-        (result: R1) => Selector<S2, R2>,
-        SelectorChainType
-      >
-    >;
-
-  public chain<S2, P2, R2>(
-    fn: (result: R1) => ParametricSelector<S2, P2, R2>,
-    options?: ChainSelectorOptions,
-  ): SelectorType extends Selector<S1, R1>
-    ? SelectorMonad<
-      S1 & S2,
-      P2,
-      R2,
-      NamedParametricSelector<S1 & S2, P2, R2>,
-      SelectorChainHierarchy<
-        (result: R1) => ParametricSelector<S2, P2, R2>,
-        SelectorChainType
-      >
-    >
-    : SelectorMonad<
-      S1 & S2,
-      P1 & P2,
-      R2,
-      NamedParametricSelector<S1 & S2, P1 & P2, R2>,
-      SelectorChainHierarchy<
-        (result: R1) => ParametricSelector<S2, P2, R2>,
-        SelectorChainType
-      >
-    >;
-
-  public chain<S2, P2, R2>(
-    fn: SelectorChain<R1, S2, P2, R2>,
-    inputOptions?: ChainSelectorOptions,
-  ) {
-    const options = {
-      ...this.options,
-      ...inputOptions,
-    };
-
-    const keySelector = isCachedSelector(this.selector)
-      ? this.selector.keySelector
-      : defaultKeySelector;
-
-    const {
-      createSelectorOptions = () => ({}),
-      keySelectorComposer = stringComposeKeySelectors,
-    } = options;
-
-    const keySelectorCreator = createKeySelectorCreator(keySelectorComposer);
-
-    const higherOrderSelector = createCachedSelector(
-      [this.selector],
-      fn,
-    )({
-      ...createSelectorOptions(),
-      keySelector,
-    });
-
-    /* istanbul ignore else  */
-    if (process.env.NODE_ENV !== 'production') {
-      /* istanbul ignore else  */
-      if (isDebugMode()) {
-        defineDynamicSelectorName(higherOrderSelector, () => {
-          const baseName = getSelectorName(this.selector);
-
-          return `higher order for ${baseName} (${sumString(fn)})`;
-        });
-      }
-    }
-
-    const combinedSelector = (state: S1 & S2, props: P1 & P2) => {
-      const derivedSelector = higherOrderSelector(state, props);
-
-      combinedSelector.dependencies = [higherOrderSelector, derivedSelector];
-
-      /* istanbul ignore else  */
-      if (process.env.NODE_ENV !== 'production') {
-        /* istanbul ignore else  */
-        if (isDebugMode()) {
-          const derivedSelectorName = getSelectorName(derivedSelector);
-
-          if (!derivedSelectorName) {
-            defineDynamicSelectorName(derivedSelector, () => {
-              const baseName = getSelectorName(this.selector);
-              const derivedSelectorKey = generateSelectorKey(derivedSelector);
-
-              return `derived from ${baseName} (${derivedSelectorKey})`;
-            });
-          }
-
-          defineDynamicSelectorName(combinedSelector, () => {
-            const baseName = getSelectorName(this.selector);
-            const dependencyName = getSelectorName(derivedSelector);
-
-            return `${baseName} (chained by ${dependencyName})`;
-          });
-        }
-      }
-
-      return derivedSelector(state, props);
-    };
-
-    combinedSelector.dependencies = [higherOrderSelector] as unknown[];
-    combinedSelector.cache = higherOrderSelector.cache;
-
-    const higherOrderKeySelector = createCachedSelector(
-      [higherOrderSelector],
-      derivedSelector => {
-        return keySelectorCreator({
-          inputSelectors: [higherOrderSelector, derivedSelector],
-        });
-      },
-    )({
-      ...createSelectorOptions(),
-      keySelector,
-    });
-
-    combinedSelector.keySelector = (state: S1 & S2, props: P1 & P2) => {
-      const derivedKeySelector = higherOrderKeySelector(state, props);
-      return derivedKeySelector(state, props) as unknown;
-    };
-
-    /* istanbul ignore else  */
-    if (process.env.NODE_ENV !== 'production') {
-      /* istanbul ignore else  */
-      if (isDebugMode()) {
-        defineDynamicSelectorName(combinedSelector, () => {
-          const baseName = getSelectorName(this.selector);
-
-          return `${baseName} (will be chained ${sumString(fn)})`;
-        });
-      }
-    }
-
-    const prevChain = Object.assign(fn, {
-      parentChain: this.prevChain,
-    });
-
-    return new SelectorMonad<
-      S1 & S2,
-      P1 & P2,
-      R2,
-      typeof combinedSelector,
-      typeof prevChain
-    >(combinedSelector, options, prevChain) as unknown;
-  }
-
-  public map<R2>(fn: (result: R1) => R2, options?: ChainSelectorOptions) {
-    return this.chain((result) => {
-      const output = fn(result);
-      const selector = () => output;
-
-      /* istanbul ignore else  */
-      if (process.env.NODE_ENV !== 'production') {
-        /* istanbul ignore else  */
-        if (isDebugMode()) {
-          defineDynamicSelectorName(selector, () => {
-            const baseName = getSelectorName(this.selector);
-
-            return `mapped from ${baseName} (${sumString(fn)})`;
-          });
-        }
-      }
-
-      return selector;
-    }, options);
-  }
-
-  public build() {
-    return Object.assign(this.selector, {
-      chainHierarchy: this.prevChain,
-    });
-  }
-}
-
-export function createChainSelector<S, R>(
-  selector: Selector<S, R>,
-  options?: ChainSelectorOptions,
-): SelectorMonad<S, void, R, Selector<S, R>, void>;
-
-export function createChainSelector<S, P, R>(
-  selector: ParametricSelector<S, P, R>,
-  options?: ChainSelectorOptions,
-): SelectorMonad<S, P, R, ParametricSelector<S, P, R>, void>;
-
-export function createChainSelector<S, P, R>(
-  selector: Selector<S, R> | ParametricSelector<S, P, R>,
-  options?: ChainSelectorOptions,
+    prevChain?: SelectorChainHierarchy<any, any>,
 ) {
-  return new SelectorMonad<S, P, R, typeof selector, never>(
-    selector,
-    options,
-  ) as unknown;
+    const chain = <S2, P2, R2>(fn: SelectorChain<R1, S2, P2, R2>, chainOptions?: ChainSelectorOptions) => {
+        const combinedOptions = {
+            ...options,
+            ...chainOptions,
+        };
+
+        const keySelector = isCachedSelector(selector)
+            ? selector.keySelector
+            : defaultKeySelector;
+
+        const {
+            createSelectorOptions = () => ({}),
+            keySelectorComposer = stringComposeKeySelectors,
+        } = combinedOptions;
+
+        const keySelectorCreator = createKeySelectorCreator(keySelectorComposer);
+
+        const higherOrderSelector = createCachedSelector(
+            [
+                selector,
+            ],
+            fn,
+        )({
+            ...createSelectorOptions(),
+            keySelector,
+        });
+
+        /* istanbul ignore else  */
+        if (process.env.NODE_ENV !== 'production') {
+            /* istanbul ignore else  */
+            if (isDebugMode()) {
+                defineDynamicSelectorName(higherOrderSelector, () => {
+                    const baseName = getSelectorName(selector);
+
+                    return `higher order for ${baseName} (${stringifyFunction(fn)})`;
+                });
+            }
+        }
+
+        type CombineSelector = ParametricSelector<S1 & S2, P1 & P2, R1 & R2> & {
+            dependencies: any;
+            cache: ICacheObject;
+            keySelector?: KeySelector<S1 & S2>;
+        };
+
+        const combinedSelector: CombineSelector = (state: S1 & S2, props: P1 & P2): R1 & R2 => {
+            const derivedSelector = higherOrderSelector(state, props);
+
+            combinedSelector.dependencies = [higherOrderSelector, derivedSelector];
+
+            /* istanbul ignore else  */
+            if (process.env.NODE_ENV !== 'production') {
+                /* istanbul ignore else  */
+                if (isDebugMode()) {
+                    const derivedSelectorName = getSelectorName(derivedSelector);
+
+                    if (!derivedSelectorName) {
+                        defineDynamicSelectorName(derivedSelector, () => {
+                            const baseName = getSelectorName(selector);
+                            const derivedSelectorKey = generateSelectorKey(derivedSelector);
+
+                            return `derived from ${baseName} (${derivedSelectorKey})`;
+                        });
+                    }
+
+                    defineDynamicSelectorName(combinedSelector, () => {
+                        const baseName = getSelectorName(selector);
+                        const dependencyName = getSelectorName(derivedSelector);
+
+                        return `${baseName} (chained by ${dependencyName})`;
+                    });
+                }
+            }
+
+            return derivedSelector(state, props) as any;
+        };
+
+        combinedSelector.dependencies = [
+            higherOrderSelector
+        ];
+        combinedSelector.cache = higherOrderSelector.cache;
+
+        const higherOrderKeySelector = createCachedSelector(
+            [
+                higherOrderSelector
+            ],
+            derivedSelector => {
+                return keySelectorCreator({
+                    inputSelectors: [higherOrderSelector, derivedSelector],
+                });
+            },
+        )({
+            ...createSelectorOptions(),
+            keySelector,
+        });
+
+        combinedSelector.keySelector = (state: S1 & S2, props: P1 & P2) => {
+            const derivedKeySelector = higherOrderKeySelector(state, props);
+            return derivedKeySelector(state, props);
+        };
+
+        /* istanbul ignore else  */
+        if (process.env.NODE_ENV !== 'production') {
+            /* istanbul ignore else  */
+            if (isDebugMode()) {
+                defineDynamicSelectorName(combinedSelector, () => {
+                    const baseName = getSelectorName(selector);
+
+                    return `${baseName} (will be chained ${stringifyFunction(fn)})`;
+                });
+            }
+        }
+
+        const nextPrevChain = Object.assign(fn, {
+            parentChain: prevChain,
+        });
+
+        return createChainSelector<S1 & S2, P1 & P2, R1 & R2>(
+            combinedSelector, combinedOptions, nextPrevChain
+        );
+    };
+
+    const map = <R2>(fn: (result: R1) => R2, mapOptions?: ChainSelectorOptions) => {
+        const mapSelector = (result: R1) => {
+            const output = fn(result);
+            const mapSelector = () => output;
+
+            /* istanbul ignore else  */
+            if (process.env.NODE_ENV !== 'production') {
+                /* istanbul ignore else  */
+                if (isDebugMode()) {
+                    defineDynamicSelectorName(mapSelector, () => {
+                        const baseName = getSelectorName(selector);
+
+                        return `mapped from ${baseName} (${stringifyFunction(fn)})`;
+                    });
+                }
+            }
+
+            return mapSelector;
+        };
+
+        return chain(mapSelector, mapOptions);
+    };
+
+    const build = () => {
+        return Object.assign(selector, {
+            chainHierarchy: prevChain,
+        });
+    };
+
+    return {
+        chain,
+        map,
+        build,
+    };
 }
