@@ -2,7 +2,7 @@ import {createSelector, setGlobalDevModeChecks} from '@veksa/reselect';
 import {createCachedSelector} from '@veksa/re-reselect';
 import {createChainSelector} from '../createChainSelector';
 import {createBoundSelector} from '../createBoundSelector';
-import {commonState, State} from '../__data__/state';
+import {commonState, MessageStateSegment, PersonStateSegment, State} from '../__data__/state';
 import {createPathSelector} from '../createPathSelector';
 import {createPropSelector} from '../createPropSelector';
 import {createKeySelectorCreator} from '../keys/createKeySelectorCreator';
@@ -16,11 +16,16 @@ jest.mock('../debug/debug', () => ({
 }));
 
 describe('createChainSelector', () => {
-    const personSelector = (state: State, props: { id: number }) => {
+    const personSelector = (state: PersonStateSegment, props: { id: number }) => {
         return state.persons[props.id];
     };
-    const messageSelector = (state: State, props: { id: number }) => {
-        return state.messages[props.id];
+
+    const messagesSelector = (state: MessageStateSegment) => {
+        return state.messages;
+    };
+
+    const messageSelector = (state: MessageStateSegment, props: { id: number }) => {
+        return state.messages.data[props.id];
     };
 
     const fullNameSelector = createSelector(
@@ -54,21 +59,33 @@ describe('createChainSelector', () => {
     });
 
     test('should implement simple selector chain', () => {
-        const personByMessageIdSelector = createChainSelector(messageSelector)
-            .chain(message => {
-                return createBoundSelector(personSelector, {
-                    id: message.personId
-                });
-            })
-            .chain(person => {
-                return createBoundSelector(fullNameSelector, {
-                    id: person.id
-                });
-            })
-            .build();
+        const personByMessageIdSelector = createChainSelector(
+            messageSelector
+        ).chain(message => {
+            return createBoundSelector(personSelector, {
+                id: message.personId
+            });
+        }).chain(person => {
+            return createBoundSelector(fullNameSelector, {
+                id: person.id
+            });
+        }).build();
 
         expect(personByMessageIdSelector(commonState, {id: 100})).toBe('Marry Poppins');
         expect(personByMessageIdSelector(commonState, {id: 200})).toBe('Harry Potter');
+    });
+
+    test('should implement simple optional selection', () => {
+        const currentMessageSelector = createChainSelector(
+            createPathSelector(messagesSelector).currentMessageId(),
+        ).chain(messageId => {
+            return createBoundSelector(messageSelector, {
+                id: messageId,
+            });
+        }).build();
+
+        expect(createPathSelector(currentMessageSelector).personId()(commonState, {id: 100})).toBe('Marry Poppins');
+        expect(createPathSelector(currentMessageSelector).personId()(commonState, {id: 200})).toBe('Harry Potter');
     });
 
     test('should cached chain callback by result of input selector', () => {
@@ -165,7 +182,7 @@ describe('createChainSelector', () => {
 
         const cachedMessageSelector = createCachedSelector(
             [
-                (state: State) => state.messages,
+                (state: State) => state.messages.data,
                 (state: State, props: { messageId: number }) => props.messageId,
             ],
             (messages, messageId) => {
