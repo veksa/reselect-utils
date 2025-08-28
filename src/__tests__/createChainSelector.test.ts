@@ -16,9 +16,21 @@ jest.mock('../debug/debug', () => ({
 }));
 
 describe('createChainSelector', () => {
-    const personSelector = (state: PersonStateSegment, props: { id: number }) => {
-        return state.persons[props.id];
+    const personsSelector = (state: PersonStateSegment) => {
+        return state.persons;
     };
+
+    const personSelector = createCachedSelector(
+        [
+            createPathSelector(personsSelector).data(),
+            createPropSelector<{id: number}>().id(),
+        ],
+        (data, id) => {
+            return data[id];
+        },
+    )({
+        keySelector: createPropSelector<{id: number}>().id(),
+    });
 
     const messagesSelector = (state: MessageStateSegment) => {
         return state.messages;
@@ -86,6 +98,19 @@ describe('createChainSelector', () => {
 
         expect(currentMessageSelector(commonState, {}).personId).toBe(2);
         expect(createPathSelector(currentMessageSelector).personId()(commonState, {})).toBe(2);
+    });
+
+    test('should implement path chain selector for name property', () => {
+        const personByMessageIdSelector = createChainSelector(
+            createPathSelector(personsSelector).currentPersonId(),
+        ).chain(personId => {
+            return createBoundSelector(personSelector, {
+                id: personId,
+            });
+        }).build();
+
+        expect(createPathSelector(personByMessageIdSelector).firstName()(commonState, {id: 100})).toBe('M Poppins');
+        expect(createPathSelector(personByMessageIdSelector).name()(commonState, {id: 100})).toBe('M Poppins');
     });
 
     test('should cached chain callback by result of input selector', () => {
@@ -171,10 +196,10 @@ describe('createChainSelector', () => {
         const cachedPersonSelector = createCachedSelector(
             [
                 (state: State) => state.persons,
-                (state: State, props: { personId: number }) => props.personId,
+                (_state: State, props: { personId: number }) => props.personId,
             ],
             (persons, personId) => {
-                return persons[personId];
+                return persons.data[personId];
             },
         )({
             keySelector: (_state: State, props: { personId: number }) => props.personId,
@@ -183,7 +208,7 @@ describe('createChainSelector', () => {
         const cachedMessageSelector = createCachedSelector(
             [
                 (state: State) => state.messages.data,
-                (state: State, props: { messageId: number }) => props.messageId,
+                (_state: State, props: { messageId: number }) => props.messageId,
             ],
             (messages, messageId) => {
                 return messages[messageId];
@@ -303,7 +328,7 @@ describe('createChainSelector', () => {
         const longestFullNameSelector = createChainSelector(personsSelector)
             .chain(persons => {
                 return createSequenceSelector(
-                    Object.values(persons).map(person => {
+                    Object.values(persons.data).map(person => {
                         return createBoundSelector(fullNameSelector, {id: person.id});
                     }),
                 );

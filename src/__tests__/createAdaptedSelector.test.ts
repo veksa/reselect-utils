@@ -11,10 +11,8 @@ jest.mock('../debug/debug', () => ({
 }));
 
 describe('createAdaptedSelector', () => {
-    const personSelector = (state: State, props: { id: number }) =>
-        state.persons[props.id];
-    const messageSelector = (state: State, props: { id: number }) =>
-        state.messages.data[props.id];
+    const personSelector = (state: State, props: { id: number }) => state.persons.data[props.id];
+    const messageSelector = (state: State, props: { id: number }) => state.messages.data[props.id];
 
     const personAdaptedSelector = createAdaptedSelector(
         personSelector,
@@ -98,7 +96,7 @@ describe('createAdaptedSelector', () => {
         const fullNameCachedSelector = createCachedSelector(
             [personSelector],
             ({firstName = '', secondName = ''}) => `${firstName} ${secondName}`,
-        )((state, props) => props.id);
+        )((_state, props) => props.id);
 
         test('should decorate getMatchingSelector and removeMatchingSelector of dependency', () => {
             const fullNameAdaptedCachedSelector = createAdaptedSelector(

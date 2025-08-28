@@ -6,7 +6,7 @@ export { createPropSelector } from './createPropSelector';
 export { createBoundSelector } from './createBoundSelector';
 export { createEmptySelector } from './createEmptySelector';
 export { createAdaptedSelector } from './createAdaptedSelector';
-export { createChainSelector, ChainSelectorOptions } from './createChainSelector';
+export { createChainSelector, type ChainSelectorOptions } from './createChainSelector';
 export { createCachedSequenceSelector } from './createCachedSequenceSelector';
 export { createCachedStructuredSelector } from './createCachedStructuredSelector';
 

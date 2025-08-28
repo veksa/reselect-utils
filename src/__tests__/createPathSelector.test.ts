@@ -59,12 +59,11 @@ describe('createPathSelector', () => {
             const personSelector = createCachedSelector(
                 [
                     (state: State) => state.persons,
-                    (state: State, props: { personId: number }) => props.personId,
+                    (_state: State, props: { personId: number }) => props.personId,
                 ],
-                (persons, personId) => persons[personId],
+                (persons, personId) => persons.data[personId],
             )({
-                keySelector: (state: State, props: { personId: number }) =>
-                    props.personId,
+                keySelector: (_state: State, props: { personId: number }) => props.personId,
             });
 
             const firstNameSelector = createPathSelector(personSelector).firstName();

@@ -1,5 +1,6 @@
 export type Person = {
     id: number;
+    name?: string;
     firstName?: string;
     secondName?: string;
 };
@@ -17,7 +18,10 @@ export type Document = {
     data: number[];
 };
 
-export type PersonState = Record<number, Person>;
+export type PersonState = {
+    currentPersonId?: number;
+    data: Record<number, Person>;
+};
 
 export type PersonStateSegment = {
     persons: PersonState;
@@ -44,15 +48,19 @@ export type State =
 
 export const commonState: State = {
     persons: {
-        1: {
-            id: 1,
-            firstName: 'Marry',
-            secondName: 'Poppins',
-        },
-        2: {
-            id: 2,
-            firstName: 'Harry',
-            secondName: 'Potter',
+        data: {
+            1: {
+                id: 1,
+                name: 'M Poppins',
+                firstName: 'Marry',
+                secondName: 'Poppins',
+            },
+            2: {
+                id: 2,
+                name: 'H Potter',
+                firstName: 'Harry',
+                secondName: 'Potter',
+            },
         },
     },
 

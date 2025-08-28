@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
+    "jsx": "react",
     "target": "es2015",
+    "outDir": "./dist",
     "module": "commonjs",
+    "moduleResolution": "node",
     "lib": [
       "dom",
       "es2020"
@@ -12,12 +14,15 @@
       "types"
     ],
     "strict": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
     "esModuleInterop": true,
+    "importHelpers": true,
+    "isolatedModules": true,
     "downlevelIteration": true,
-    "jsx": "react",
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
     "noUnusedLocals": true,
+    "sourceMap": true,
+    "preserveConstEnums": true,
     "skipLibCheck": true
   },
   "include": [

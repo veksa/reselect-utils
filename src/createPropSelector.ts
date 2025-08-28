@@ -9,7 +9,7 @@ export const isPropSelector = (selector: unknown): selector is { path: Path } =>
 };
 
 export function createPropSelector<P>(): RequiredPathParametricSelectorType<unknown, P, P, [ParametricSelector<unknown, P, P>]> {
-    const propsSelector = (state: unknown, props: unknown) => props;
+    const propsSelector = (_state: unknown, props: unknown) => props;
 
     const applyMeta = (selector: unknown) => {
         Object.defineProperty(selector, propSelectorSymbol, {value: true});

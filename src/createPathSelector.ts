@@ -24,25 +24,20 @@ export type PathParametricSelector<S, P, R, D> = NamedParametricSelector<S, P, R
     path: Path;
 };
 
-export type RequiredSelectorBuilder<S, R, D> = () => PathSelector<S, R, D>;
+type Required<T> = { [P in keyof T]-?: Exclude<T[P], undefined | null> };
 
-export type OptionalSelectorBuilder<S, R, D> = {
-    (noDefaultValue?: undefined): PathSelector<S, Defined<R>, D>;
+export type RequiredSelectorBuilder<S, R, D> = (R extends object ? { [K in keyof R]: () => PathSelector<S, NonNullable<R[K]>, D>; } : {});
 
-    (defaultValue: NonNullable<R>): PathSelector<S, NonNullable<R>, D>;
+export type OptionalSelectorBuilder<S, R, D> =
+    ((defaultValue?: R) => PathSelector<S, R extends undefined ? Defined<R> : R, D>)
+    & (R extends object ? { [K in keyof Required<R>]: () => PathSelector<S, NonNullable<R[K]>, D>; } : {});
 
-    (nullDefaultValue: R extends null ? null : never): PathSelector<S, Defined<R>, D>;
-};
+export type RequiredParametricSelectorBuilder<S, P, R, D> =
+    (R extends object ? { [K in keyof R]: () => PathParametricSelector<S, P, NonNullable<R[K]>, D>; } : {});
 
-export type RequiredParametricSelectorBuilder<S, P, R, D> = () => PathParametricSelector<S, P, R, D>;
-
-export type OptionalParametricSelectorBuilder<S, P, R, D> = {
-    (noDefaultValue?: undefined): PathParametricSelector<S, P, Defined<R>, D>;
-
-    (defaultValue: NonNullable<R>): PathParametricSelector<S, P, NonNullable<R>, D>;
-
-    (nullDefaultValue: R extends null ? null : never): PathParametricSelector<S, P, Defined<R>, D>;
-};
+export type OptionalParametricSelectorBuilder<S, P, R, D> =
+    ((defaultValue?: R) => PathParametricSelector<S, P, R extends undefined ? Defined<R> : R, D>)
+    & (R extends object ? { [K in keyof Required<R>]: () => PathParametricSelector<S, P, NonNullable<R[K]>, D>; } : {});
 
 export type RequiredObjectSelectorWrapper<S, R, D> = {
     [K in keyof R]-?: IsOptional<R[K]> extends true
@@ -178,7 +173,7 @@ export const innerCreatePathSelector = (
     };
 
     return new Proxy(proxyTarget, {
-        get: (target, key) => {
+        get: (_target, key) => {
             return innerCreatePathSelector(baseSelector, [...path, String(key)], applyMeta);
         },
     });
