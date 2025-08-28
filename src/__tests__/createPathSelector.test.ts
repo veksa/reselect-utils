@@ -8,10 +8,14 @@ describe('createPathSelector', () => {
         const baseSelector = (state: Partial<State>) => state;
         const pathSelector = createPathSelector(baseSelector);
 
-        const baseParametricSelector = (
-            state: State,
-            props: { id: number },
-        ): Document | undefined => state.documents[props.id];
+        type Props = {
+            id: number
+        };
+
+        const baseParametricSelector = (state: State, props: Props): Document | undefined => {
+            return state.documents[props.id];
+        };
+
         const pathParametricSelector = createPathSelector(baseParametricSelector);
 
         expect(pathSelector.messages.data[100].text()(commonState)).toEqual('Hello');
@@ -20,18 +24,10 @@ describe('createPathSelector', () => {
             'Default',
         );
 
-        expect(
-            pathParametricSelector.messageId()(commonState, {id: 111}),
-        ).toEqual(100);
-        expect(pathParametricSelector.data[0]()(commonState, {id: 111})).toEqual(
-            1,
-        );
-        expect(
-            pathParametricSelector.messageId()(commonState, {id: 333}),
-        ).toBeUndefined();
-        expect(
-            pathParametricSelector.messageId(100500)(commonState, {id: 333}),
-        ).toBe(100500);
+        expect(pathParametricSelector.messageId()(commonState, {id: 111}),).toEqual(100);
+        expect(pathParametricSelector.data[0]()(commonState, {id: 111})).toEqual(1,);
+        expect(pathParametricSelector.messageId()(commonState, {id: 333}),).toBeUndefined();
+        expect(pathParametricSelector.messageId(100500)(commonState, {id: 333}),).toBe(100500);
     });
 
     test('should handle states typed as interface', () => {
@@ -41,13 +37,21 @@ describe('createPathSelector', () => {
 
         const baseSelector = (state: IState) => state;
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        createPathSelector(baseSelector).name('');
-
         const nameSelector = createPathSelector(baseSelector).name();
 
         expect(nameSelector({name: 'name'})).toBe('name');
+    });
+
+    test('should handle default value for optional param', () => {
+        interface IState {
+            name?: string;
+        }
+
+        const baseSelector = (state: IState) => state;
+
+        const nameSelector = createPathSelector(baseSelector).name('default');
+
+        expect(nameSelector({})).toBe('default');
     });
 
     describe('integration with re-reselect', () => {

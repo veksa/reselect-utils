@@ -27,7 +27,7 @@ export type PathParametricSelector<S, P, R, D> = NamedParametricSelector<S, P, R
 export type RequiredSelectorBuilder<S, R, D> = () => PathSelector<S, R, D>;
 
 export type OptionalSelectorBuilder<S, R, D> = {
-    (noDefaultValue?: undefined): PathSelector<S, Defined<R> | undefined, D>;
+    (noDefaultValue?: undefined): PathSelector<S, Defined<R>, D>;
 
     (defaultValue: NonNullable<R>): PathSelector<S, NonNullable<R>, D>;
 
@@ -37,7 +37,7 @@ export type OptionalSelectorBuilder<S, R, D> = {
 export type RequiredParametricSelectorBuilder<S, P, R, D> = () => PathParametricSelector<S, P, R, D>;
 
 export type OptionalParametricSelectorBuilder<S, P, R, D> = {
-    (noDefaultValue?: undefined): PathParametricSelector<S, P, Defined<R> | undefined, D>;
+    (noDefaultValue?: undefined): PathParametricSelector<S, P, Defined<R>, D>;
 
     (defaultValue: NonNullable<R>): PathParametricSelector<S, P, NonNullable<R>, D>;
 
@@ -152,7 +152,9 @@ export const innerCreatePathSelector = (
                 result = result[path[i]];
             }
 
-            return result ?? defaultValue;
+            // For optional properties, we want to exclude undefined from the return type
+            // but still return undefined if the property doesn't exist
+            return result === undefined ? defaultValue : result;
         }
 
         Object.assign(resultSelector, baseSelector, {path});

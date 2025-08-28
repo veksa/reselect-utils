@@ -25,6 +25,7 @@ export type PersonStateSegment = {
 
 export type MessageState = {
     currentMessageId?: number;
+    unknownMessageId?: number;
     data: Record<number, Message>;
 };
 
@@ -57,6 +58,7 @@ export const commonState: State = {
 
     messages: {
         currentMessageId: 200,
+        unknownMessageId: undefined,
         data: {
             100: {
                 id: 100,
