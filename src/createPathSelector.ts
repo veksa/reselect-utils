@@ -179,18 +179,14 @@ export const innerCreatePathSelector = (
     });
 };
 
-export function createPathSelector<S, R>(
-    baseSelector: Selector<S, R>,
-): IsOptional<R> extends true
-    ? OptionalPathSelectorType<S, R, [Selector<S, R>]>
-    : RequiredPathSelectorType<S, R, [Selector<S, R>]>;
-
-export function createPathSelector<S, P, R>(
-    baseSelector: ParametricSelector<S, P, R>,
-): IsOptional<R> extends true
-    ? OptionalPathParametricSelectorType<S, P, R, [ParametricSelector<S, P, R>]>
-    : RequiredPathParametricSelectorType<S, P, R, [ParametricSelector<S, P, R>]>;
-
-export function createPathSelector(baseSelector: (...args: unknown[]) => unknown) {
-    return innerCreatePathSelector(baseSelector);
+export function createPathSelector<S, R, P = void>(
+    baseSelector: P extends void ? Selector<S, R> : ParametricSelector<S, P, R>
+): P extends void
+    ? (IsOptional<R> extends true
+        ? OptionalPathSelectorType<S, R, [Selector<S, R>]>
+        : RequiredPathSelectorType<S, R, [Selector<S, R>]>)
+    : (IsOptional<R> extends true
+        ? OptionalPathParametricSelectorType<S, P, R, [ParametricSelector<S, P, R>]>
+        : RequiredPathParametricSelectorType<S, P, R, [ParametricSelector<S, P, R>]>) {
+    return innerCreatePathSelector(baseSelector as (...args: unknown[]) => unknown) as any;
 }
