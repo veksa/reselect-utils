@@ -32,7 +32,13 @@ export function createChainSelector<S1, P1, R1>(
     selector: Selector<S1, R1> | ParametricSelector<S1, P1, R1>,
     options?: ChainSelectorOptions,
     prevChain?: SelectorChainHierarchy<any, any>,
-) {
+): {
+    chain: <S2, P2, R2>(fn: SelectorChain<R1, S2, P2, R2>, chainOptions?: ChainSelectorOptions) => ReturnType<typeof createChainSelector<S1 & S2, P1 & P2, R2>>;
+    map: <R2>(fn: (result: R1) => R2, mapOptions?: ChainSelectorOptions) => ReturnType<typeof createChainSelector<S1, P1, R2>>;
+    build: () => (Selector<S1, R1> | ParametricSelector<S1, P1, R1>) & {
+        chainHierarchy: SelectorChainHierarchy<any, any> | undefined
+    };
+} {
     const chain = <S2, P2, R2>(fn: SelectorChain<R1, S2, P2, R2>, chainOptions?: ChainSelectorOptions) => {
         const combinedOptions = {
             ...options,
