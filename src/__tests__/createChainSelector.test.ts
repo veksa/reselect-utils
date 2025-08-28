@@ -96,8 +96,8 @@ describe('createChainSelector', () => {
             });
         }).build();
 
-        expect(currentMessageSelector(commonState, {}).personId).toBe(2);
-        expect(createPathSelector(currentMessageSelector).personId()(commonState, {})).toBe(2);
+        expect(currentMessageSelector(commonState).personId).toBe(2);
+        expect(createPathSelector(currentMessageSelector).personId()(commonState)).toBe(2);
     });
 
     test('should implement path chain selector for name property', () => {
@@ -109,8 +109,8 @@ describe('createChainSelector', () => {
             });
         }).build();
 
-        expect(createPathSelector(personByMessageIdSelector).firstName()(commonState, {id: 100})).toBe('M Poppins');
-        expect(createPathSelector(personByMessageIdSelector).name()(commonState, {id: 100})).toBe('M Poppins');
+        expect(createPathSelector(personByMessageIdSelector).firstName()(commonState)).toBe('M Poppins');
+        expect(createPathSelector(personByMessageIdSelector).name()(commonState)).toBe('M Poppins');
     });
 
     test('should cached chain callback by result of input selector', () => {
@@ -142,7 +142,7 @@ describe('createChainSelector', () => {
             .build();
 
         const firstDependencies = firstPersonSelector.dependencies;
-        firstPersonMonadicSelector(commonState, {});
+        firstPersonMonadicSelector(commonState);
         const secondDependencies = firstPersonSelector.dependencies;
 
         expect(firstDependencies?.length).toBeDefined();
@@ -340,7 +340,7 @@ describe('createChainSelector', () => {
             })
             .build();
 
-        expect(longestFullNameSelector(commonState, {})).toBe('Marry Poppins');
+        expect(longestFullNameSelector(commonState)).toBe('Marry Poppins');
     });
 
     test('should generate selector name', () => {

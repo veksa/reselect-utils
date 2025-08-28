@@ -11,11 +11,18 @@ import {getSelectorName} from "./_helpers/getSelectorName";
 import {generateSelectorKey} from "./_helpers/generateSelectorKey";
 import {stringifyFunction} from "./_helpers/stringifyFunction";
 
-export type SelectorChain<R1, S1, P1, R2> = (result: R1) => Selector<S1, R2> | ParametricSelector<S1, P1, R2>;
+export type SelectorChain<R1, S1, R2> = (result: R1) => Selector<S1, R2>;
+
+export type ParametricSelectorChain<R1, S1, P1, R2> = (result: R1) => ParametricSelector<S1, P1, R2>;
 
 export type SelectorChainHierarchy<
-    C extends SelectorChain<any, any, any, any>,
+    C extends SelectorChain<any, any, any>,
     H extends SelectorChainHierarchy<any, any>
+> = C & { parentChain?: H };
+
+export type ParametricSelectorChainHierarchy<
+    C extends ParametricSelectorChain<any, any, any, any>,
+    H extends ParametricSelectorChainHierarchy<any, any>
 > = C & { parentChain?: H };
 
 export type CreateSelectorOptions<SelectorCreator extends typeof createSelectorCreator> = {
@@ -28,18 +35,40 @@ export type ChainSelectorOptions<SelectorCreator extends typeof createSelectorCr
     keySelectorComposer?: KeySelectorComposer;
 };
 
-export function createChainSelector<S1, P1, R1>(
-    selector: Selector<S1, R1> | ParametricSelector<S1, P1, R1>,
-    options?: ChainSelectorOptions,
-    prevChain?: SelectorChainHierarchy<any, any>,
-): {
-    chain: <S2, P2, R2>(fn: SelectorChain<R1, S2, P2, R2>, chainOptions?: ChainSelectorOptions) => ReturnType<typeof createChainSelector<S1 & S2, P1 & P2, R2>>;
-    map: <R2>(fn: (result: R1) => R2, mapOptions?: ChainSelectorOptions) => ReturnType<typeof createChainSelector<S1, P1, R2>>;
-    build: () => (Selector<S1, R1> | ParametricSelector<S1, P1, R1>) & {
+interface ChainSelectorResult<S1, R1> {
+    chain: <S2, R2 = any>(fn: SelectorChain<R1, S2, R2>, chainOptions?: ChainSelectorOptions) => ChainSelectorResult<S1 & S2, R2>;
+    map: <R2>(fn: (result: R1) => R2, mapOptions?: ChainSelectorOptions) => ChainSelectorResult<S1, R2>;
+    build: () => Selector<S1, R1> & {
         chainHierarchy: SelectorChainHierarchy<any, any> | undefined
     };
-} {
-    const chain = <S2, P2, R2>(fn: SelectorChain<R1, S2, P2, R2>, chainOptions?: ChainSelectorOptions) => {
+}
+
+interface ParametricChainSelectorResult<S1, P1, R1> {
+    chain: <S2, P2 = unknown, R2 = any>(fn: ParametricSelectorChain<R1, S2, P2, R2>, chainOptions?: ChainSelectorOptions) => ParametricChainSelectorResult<S1 & S2, P1 & P2, R2>;
+    map: <R2>(fn: (result: R1) => R2, mapOptions?: ChainSelectorOptions) => ParametricChainSelectorResult<S1, P1, R2>;
+    build: () => ParametricSelector<S1, P1, R1> & {
+        chainHierarchy: ParametricSelectorChainHierarchy<any, any> | undefined
+    };
+}
+
+export function createChainSelector<S1, R1>(
+    selector: Selector<S1, R1>,
+    options?: ChainSelectorOptions,
+    prevChain?: SelectorChainHierarchy<any, any>
+): ChainSelectorResult<S1, R1>;
+
+export function createChainSelector<S1, P1, R1>(
+    selector: ParametricSelector<S1, P1, R1>,
+    options?: ChainSelectorOptions,
+    prevChain?: ParametricSelectorChainHierarchy<any, any>
+): ParametricChainSelectorResult<S1, P1, R1>;
+
+export function createChainSelector<S1, P1, R1>(
+    selector: any,
+    options?: ChainSelectorOptions,
+    prevChain?: any
+): any {
+    const chain = <S2, P2, R2>(fn: any, chainOptions?: ChainSelectorOptions) => {
         const combinedOptions = {
             ...options,
             ...chainOptions,
@@ -85,7 +114,7 @@ export function createChainSelector<S1, P1, R1>(
         };
 
         const combinedSelector: CombineSelector = (state: S1 & S2, props: P1 & P2): R1 & R2 => {
-            const derivedSelector = higherOrderSelector(state, props);
+            const derivedSelector: any = (higherOrderSelector as any)(state, props);
 
             combinedSelector.dependencies = [higherOrderSelector, derivedSelector];
 
@@ -113,7 +142,7 @@ export function createChainSelector<S1, P1, R1>(
                 }
             }
 
-            return derivedSelector(state, props) as any;
+            return derivedSelector(state, props);
         };
 
         combinedSelector.dependencies = [
@@ -136,7 +165,7 @@ export function createChainSelector<S1, P1, R1>(
         });
 
         combinedSelector.keySelector = (state: S1 & S2, props: P1 & P2) => {
-            const derivedKeySelector = higherOrderKeySelector(state, props);
+            const derivedKeySelector = (higherOrderKeySelector as any)(state, props);
             return derivedKeySelector(state, props);
         };
 
