@@ -18,7 +18,7 @@ describe('createBoundSelector', () => {
   const personSelector = (state: State, props: { personId: number }) =>
     state.persons[props.personId];
   const messageSelector = (state: State, props: { messageId: number }) =>
-    state.messages[props.messageId];
+    state.messages.data[props.messageId];
 
   const personAndMessageSelector = createStructuredSelector({
     person: personSelector,

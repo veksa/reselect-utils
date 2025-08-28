@@ -11,7 +11,7 @@ import {getSelectorName} from "./_helpers/getSelectorName";
 import {generateSelectorKey} from "./_helpers/generateSelectorKey";
 import {stringifyFunction} from "./_helpers/stringifyFunction";
 
-export type SelectorChain<R1, S, P, R2> = (result: R1) => Selector<S, R2> | ParametricSelector<S, P, R2>;
+export type SelectorChain<R1, S1, P1, R2> = (result: R1) => Selector<S1, R2> | ParametricSelector<S1, P1, R2>;
 
 export type SelectorChainHierarchy<
     C extends SelectorChain<any, any, any, any>,

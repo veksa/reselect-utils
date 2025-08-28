@@ -84,8 +84,8 @@ describe('createChainSelector', () => {
             });
         }).build();
 
-        expect(createPathSelector(currentMessageSelector).personId()(commonState, {id: 100})).toBe('Marry Poppins');
-        expect(createPathSelector(currentMessageSelector).personId()(commonState, {id: 200})).toBe('Harry Potter');
+        expect(currentMessageSelector(commonState, {}).personId).toBe(2);
+        expect(createPathSelector(currentMessageSelector).personId()(commonState, {})).toBe(2);
     });
 
     test('should cached chain callback by result of input selector', () => {
