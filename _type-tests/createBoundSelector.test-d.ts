@@ -1,5 +1,5 @@
 import { expectTypeOf } from 'expect-type';
-import { Selector, ParametricSelector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { createBoundSelector } from '../src/index';
 import { Person, State } from './models';
 
@@ -28,7 +28,7 @@ const partiallyBoundSelector = createBoundSelector(twoPropsSelector, {
 });
 
 expectTypeOf(partiallyBoundSelector).toExtend<
-  ParametricSelector<State, { messageId: number }, Person | undefined>
+  Selector<State, Person | undefined, [{ messageId: number }]>
 >();
 expectTypeOf(partiallyBoundSelector(stateFixture, { messageId: 100 })).toEqualTypeOf<
   Person | undefined

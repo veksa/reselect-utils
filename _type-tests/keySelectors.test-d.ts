@@ -1,5 +1,5 @@
 import { expectTypeOf } from 'expect-type';
-import { KeySelector, ParametricKeySelector } from '@veksa/re-reselect';
+import { KeySelector } from '../src/_reReselect';
 import {
   defaultKeySelector,
   stringComposeKeySelectors,
@@ -9,6 +9,11 @@ import {
 } from '../src/index';
 import { DocumentProps, MessageProps, PersonProps, State } from './models';
 
+// In the unified model a "parametric" key selector is simply a function of
+// state + props; the composer preserves the exact input functions as its
+// `dependencies` tuple.
+type ParametricKeySelector<S, P> = (state: S, props: P) => unknown;
+
 // the default key selector always produces a string key
 expectTypeOf(defaultKeySelector()).toEqualTypeOf<string>();
 
@@ -17,7 +22,7 @@ const singleComposed = stringComposeKeySelectors(
   (state: State) => state.persons.currentPersonId ?? 0,
 );
 expectTypeOf(singleComposed).toExtend<KeySelector<State>>();
-expectTypeOf(singleComposed.dependencies).toEqualTypeOf<[KeySelector<State>]>();
+expectTypeOf(singleComposed.dependencies).toEqualTypeOf<[(state: State) => number]>();
 
 // composing two parametric key selectors intersects state and props types
 const composedKeySelector = stringComposeKeySelectors(
@@ -29,7 +34,7 @@ expectTypeOf(composedKeySelector).toExtend<
   ParametricKeySelector<State, PersonProps & MessageProps>
 >();
 expectTypeOf(composedKeySelector.dependencies).toEqualTypeOf<
-  [ParametricKeySelector<State, PersonProps>, ParametricKeySelector<State, MessageProps>]
+  [(state: State, props: PersonProps) => number, (state: State, props: MessageProps) => number]
 >();
 
 // composing three parametric key selectors keeps intersecting the props types
@@ -43,9 +48,9 @@ expectTypeOf(tripleComposed).toExtend<
 >();
 expectTypeOf(tripleComposed.dependencies).toEqualTypeOf<
   [
-    ParametricKeySelector<State, PersonProps>,
-    ParametricKeySelector<State, MessageProps>,
-    ParametricKeySelector<State, DocumentProps>,
+    (state: State, props: PersonProps) => number,
+    (state: State, props: MessageProps) => number,
+    (state: State, props: DocumentProps) => number,
   ]
 >();
 

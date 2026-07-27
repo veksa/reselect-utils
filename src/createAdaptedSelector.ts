@@ -1,4 +1,4 @@
-import { ParametricSelector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { CachedSelector, NamedParametricSelector } from './types';
 import { isDebugMode } from './debug/debug';
 import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
@@ -26,7 +26,7 @@ const generateMappingName = <P1 extends object, P2>(mapping: (props: P2) => P1) 
 
 const innerCreateAdaptedSelector =
   <S, P1, P2, R>(
-    baseSelector: ParametricSelector<S, P1, R>,
+    baseSelector: Selector<S, R, [P1]>,
     mapping: (props: P2) => P1,
   ): NamedParametricSelector<S, P2, R> =>
   (state: S, props: P2) => {
@@ -34,7 +34,7 @@ const innerCreateAdaptedSelector =
   };
 
 export const createAdaptedSelector = <S, P1 extends object, P2, R>(
-  baseSelector: ParametricSelector<S, P1, R>,
+  baseSelector: Selector<S, R, [P1]>,
   mapping: (props: P2) => P1,
 ) => {
   const adaptedSelector = innerCreateAdaptedSelector(baseSelector, mapping);

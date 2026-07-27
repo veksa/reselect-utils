@@ -1,5 +1,5 @@
 import { expectTypeOf } from 'expect-type';
-import { Selector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { createEmptySelector } from '../src/index';
 import { Person, PersonProps, State } from './models';
 

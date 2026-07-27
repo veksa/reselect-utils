@@ -1,4 +1,4 @@
-import { ParametricSelector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { CachedSelector, NamedParametricSelector, NamedSelector } from './types';
 import { isComposedKeySelector, KeySelectorComposer } from './keys/createKeySelectorComposer';
 import { isPropSelector } from './createPropSelector';
@@ -40,14 +40,14 @@ export type BoundSelector<S, P2, P1 extends Partial<P2>, R> =
 
 export type BoundSelectorOptions<S, P2, P1 extends Partial<P2>, R> = {
   bindingStrategy?: (
-    baseSelector: ParametricSelector<S, P1, R>,
+    baseSelector: Selector<S, R, [P1]>,
     binding: P2,
-  ) => ParametricSelector<S, Omit<P1, keyof P2>, R>;
+  ) => Selector<S, R, [Omit<P1, keyof P2>]>;
   keySelectorComposer?: KeySelectorComposer;
 };
 
 const innerCreateBoundSelector = <S, P2, P1 extends Partial<P2>, R>(
-  baseSelector: ParametricSelector<S, P1, R>,
+  baseSelector: Selector<S, R, [P1]>,
   binding: P2,
 ) => {
   const boundSelector = (state: S, props: Omit<P1, keyof P2> | void) =>
@@ -60,7 +60,7 @@ const innerCreateBoundSelector = <S, P2, P1 extends Partial<P2>, R>(
 };
 
 const createBoundInnerSelector = <S, P2 extends object, P1 extends Partial<P2>, R, OR extends R>(
-  baseSelector: ParametricSelector<S, P1, R>,
+  baseSelector: Selector<S, R, [P1]>,
   binding: P2,
   options: BoundSelectorOptions<S, P2, P1, OR> = {},
 ): BoundSelector<S, P2, P1, R> => {

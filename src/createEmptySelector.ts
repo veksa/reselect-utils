@@ -1,10 +1,10 @@
-import { ParametricSelector, Selector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { CachedSelector } from './types';
 import { isCachedSelector } from './_helpers/isCachedSelector';
 import { defaultKeySelector } from './keys/defaultKeySelector';
 
-export const createEmptySelector = <S, P, R>(
-  baseSelector: Selector<S, R> | ParametricSelector<S, P, R>,
+export const createEmptySelector = <S, R>(
+  baseSelector: Selector<S, R, any[]>,
 ): Selector<S, R | undefined> => {
   const emptySelector = () => undefined;
 

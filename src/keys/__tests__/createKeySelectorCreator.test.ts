@@ -1,4 +1,4 @@
-import { createCachedSelector } from '@veksa/re-reselect';
+import { createCachedSelector } from '../../_reReselect';
 import { createPropSelector } from '../../createPropSelector';
 import { createKeySelectorCreator } from '../createKeySelectorCreator';
 import { createPathSelector } from '../../createPathSelector';

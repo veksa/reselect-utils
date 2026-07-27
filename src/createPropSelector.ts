@@ -1,4 +1,4 @@
-import { ParametricSelector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { innerCreatePathSelector, RequiredPathParametricSelectorType } from './createPathSelector';
 import { Path } from './types';
 
@@ -12,7 +12,7 @@ export function createPropSelector<P>(): RequiredPathParametricSelectorType<
   unknown,
   P,
   P,
-  [ParametricSelector<unknown, P, P>]
+  [Selector<unknown, P, [P]>]
 > {
   const propsSelector = (_state: unknown, props: unknown) => props;
 
@@ -24,5 +24,5 @@ export function createPropSelector<P>(): RequiredPathParametricSelectorType<
     propsSelector,
     [],
     applyMeta,
-  ) as RequiredPathParametricSelectorType<unknown, P, P, [ParametricSelector<unknown, P, P>]>;
+  ) as RequiredPathParametricSelectorType<unknown, P, P, [Selector<unknown, P, [P]>]>;
 }

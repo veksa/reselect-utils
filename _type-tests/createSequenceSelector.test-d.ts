@@ -1,6 +1,6 @@
 import { expectTypeOf } from 'expect-type';
 import { createSelector } from '@veksa/reselect';
-import { Selector, ParametricSelector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { createSequenceSelector } from '../src/createSequenceSelector';
 import { PersonProps, State } from './models';
 
@@ -31,7 +31,5 @@ const getParametricNumbers = createSequenceSelector<State, PersonProps, number>(
   (state) => state.persons.currentPersonId ?? 0,
 ]);
 
-expectTypeOf(getParametricNumbers).toEqualTypeOf<
-  ParametricSelector<State, PersonProps, number[]>
->();
+expectTypeOf(getParametricNumbers).toEqualTypeOf<Selector<State, number[], [PersonProps]>>();
 expectTypeOf(getParametricNumbers(stateFixture, { personId: 1 })).toEqualTypeOf<number[]>();

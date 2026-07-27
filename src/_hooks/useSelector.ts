@@ -2,17 +2,13 @@ import { shallowEqual, useSelector as useReduxSelector } from '@veksa/react-redu
 import { useMemoWith } from './useMemoWith';
 import { useCallback, useMemo } from 'react';
 
-export type Selector<S, R> = (state: S) => R;
-export type ParametricSelector<S, P, R> = (state: S, props: P, ...args: any[]) => R;
-
-export function useSelector<S extends object, R>(selector: Selector<S, R>): R;
-
-export function useSelector<S extends object, P extends object, R>(
-  selector: ParametricSelector<S, P, R>,
-  props: P,
+export function useSelector<S extends object, R, Params extends readonly unknown[]>(
+  selector: (state: S, ...params: Params) => R,
+  ...params: Params
 ): R;
 
-export function useSelector(selector: Function, props?: any) {
+export function useSelector(selector: Function, ...params: any[]) {
+  const props = params[0];
   const memoizedProps = useMemoWith(props, shallowEqual);
 
   // unfreeze props for performance optimization (see temporaryAssign.ts)

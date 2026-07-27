@@ -1,5 +1,4 @@
-import { createSelector } from '@veksa/reselect';
-import { ParametricSelector, Selector } from '@veksa/re-reselect';
+import { createSelector, Selector } from '@veksa/reselect';
 
 export function createSequenceSelector<S, R>(
   selectors: Selector<S, R>[],
@@ -7,10 +6,10 @@ export function createSequenceSelector<S, R>(
 ): Selector<S, R[]>;
 
 export function createSequenceSelector<S, P, R>(
-  selectors: ParametricSelector<S, P, R>[],
+  selectors: Selector<S, R, [P]>[],
   selectorCreator?: typeof createSelector,
-): ParametricSelector<S, P, R[]>;
+): Selector<S, R[], [P]>;
 
 export function createSequenceSelector(selectors: any, selectorCreator = createSelector) {
-  return selectorCreator(selectors, (...results) => results);
+  return selectorCreator(selectors, (...results: unknown[]) => results);
 }

@@ -1,4 +1,4 @@
-import { ICacheObject } from '@veksa/re-reselect';
+import { ICacheObject } from '../_reReselect';
 
 const cache: Record<string, Record<string, { data: object; time: number }>> = {};
 

@@ -1,12 +1,6 @@
-import {
-  createCachedSelector,
-  ICacheObject,
-  KeySelector,
-  ParametricSelector,
-  Selector,
-} from '@veksa/re-reselect';
+import { createSelectorCreator, Selector } from '@veksa/reselect';
+import { createCachedSelector, ICacheObject, KeySelector } from './_reReselect';
 import { KeySelectorComposer } from './keys/createKeySelectorComposer';
-import { createSelectorCreator } from '@veksa/reselect';
 import { isCachedSelector } from './_helpers/isCachedSelector';
 import { defaultKeySelector } from './keys/defaultKeySelector';
 import { stringComposeKeySelectors } from './keys/stringComposeKeySelectors';
@@ -19,9 +13,7 @@ import { stringifyFunction } from './_helpers/stringifyFunction';
 
 export type SelectorChain<R1, S1, R2> = (result: R1) => Selector<S1, R2>;
 
-export type ParametricSelectorChain<R1, S1, P1, R2> = (
-  result: R1,
-) => ParametricSelector<S1, P1, R2>;
+export type ParametricSelectorChain<R1, S1, P1, R2> = (result: R1) => Selector<S1, R2, [P1]>;
 
 export type SelectorChainHierarchy<
   C extends SelectorChain<any, any, any>,
@@ -54,7 +46,7 @@ interface ChainSelectorResult<S1, R1> {
     fn: (result: R1) => R2,
     mapOptions?: ChainSelectorOptions,
   ) => ChainSelectorResult<S1, R2>;
-  build: () => Selector<S1, R1> & {
+  build: () => Selector<S1, R1, []> & {
     chainHierarchy: SelectorChainHierarchy<any, any> | undefined;
   };
 }
@@ -68,7 +60,7 @@ interface ParametricChainSelectorResult<S1, P1, R1> {
     fn: (result: R1) => R2,
     mapOptions?: ChainSelectorOptions,
   ) => ParametricChainSelectorResult<S1, P1, R2>;
-  build: () => ParametricSelector<S1, P1, R1> & {
+  build: () => Selector<S1, R1, [P1]> & {
     chainHierarchy: ParametricSelectorChainHierarchy<any, any> | undefined;
   };
 }
@@ -80,7 +72,7 @@ export function createChainSelector<S1, R1>(
 ): ChainSelectorResult<S1, R1>;
 
 export function createChainSelector<S1, P1, R1>(
-  selector: ParametricSelector<S1, P1, R1>,
+  selector: Selector<S1, R1, [P1]>,
   options?: ChainSelectorOptions,
   prevChain?: ParametricSelectorChainHierarchy<any, any>,
 ): ParametricChainSelectorResult<S1, P1, R1>;
@@ -123,7 +115,7 @@ export function createChainSelector<S1, P1, R1>(
       }
     }
 
-    type CombineSelector = ParametricSelector<S1 & S2, P1 & P2, R1 & R2> & {
+    type CombineSelector = Selector<S1 & S2, R1 & R2, [P1 & P2]> & {
       dependencies: any;
       cache: ICacheObject;
       keySelector?: KeySelector<S1 & S2>;

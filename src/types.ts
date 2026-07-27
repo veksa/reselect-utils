@@ -1,43 +1,30 @@
-import {
-  Selector,
-  ParametricSelector,
-  CreateSelectorInstance,
-  ICacheObject,
-  KeySelector,
-  KeySelectorCreator,
-  OutputCachedSelector,
-  OutputParametricCachedSelector,
-  ParametricKeySelector,
-  ParametricKeySelectorCreator,
-} from '@veksa/re-reselect';
+import { Selector, SelectorArray } from '@veksa/reselect';
+import { OutputCachedSelector } from './_reReselect';
 
-export type NamedSelector<S, R, D = any[]> = Selector<S, R> & {
+/**
+ * A selector carrying optional debug metadata. In the unified model a
+ * "parametric" selector is simply a selector whose `Params` tuple is non-empty,
+ * so a single type covers both cases.
+ *
+ * @template Params - Extra arguments beyond `state` (e.g. `[Props]`).
+ * @template D - The selector's dependency tuple, surfaced for debug tooling.
+ */
+export type NamedSelector<S, R, Params extends readonly any[] = [], D = unknown[]> = Selector<
+  S,
+  R,
+  Params
+> & {
   selectorName?: string;
   dependencies?: D;
 };
 
-export type NamedParametricSelector<S, P, R, D = any[]> = ParametricSelector<S, P, R> & {
-  selectorName?: string;
-  dependencies?: D;
-};
+/**
+ * Back-compat alias: a parametric selector is a {@link NamedSelector} whose
+ * single extra argument is `Props`.
+ */
+export type NamedParametricSelector<S, P, R, D = unknown[]> = NamedSelector<S, R, [P], D>;
 
-export type Options<S, C, D> = {
-  selectorCreator?: CreateSelectorInstance;
-  cacheObject?: ICacheObject;
-  keySelector?: KeySelector<S>;
-  keySelectorCreator?: KeySelectorCreator<S, C, D>;
-};
-
-export type ParametricOptions<S, P, C, D> = {
-  selectorCreator?: CreateSelectorInstance;
-  cacheObject?: ICacheObject;
-  keySelector?: ParametricKeySelector<S, P>;
-  keySelectorCreator?: ParametricKeySelectorCreator<S, P, C, D>;
-};
-
-export type ReReselectSelector =
-  | ReturnType<OutputCachedSelector<any, any, any, any>>
-  | ReturnType<OutputParametricCachedSelector<any, any, any, any, any>>;
+export type ReReselectSelector = OutputCachedSelector<SelectorArray, unknown>;
 
 export type CachedSelector = Pick<ReReselectSelector, 'cache' | 'keySelector'> &
   Partial<ReReselectSelector>;

@@ -1,4 +1,4 @@
-import { ParametricSelector, Selector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { NamedParametricSelector, NamedSelector, Path } from './types';
 import { isObject } from './_helpers/isObject';
 import { isDebugMode } from './debug/debug';
@@ -11,7 +11,7 @@ export type IsOptional<T> = undefined extends T ? true : null extends T ? true :
 
 export type IsObject<T> = T extends object ? true : false;
 
-export type PathSelector<S, R, D> = NamedSelector<S, R, D> & {
+export type PathSelector<S, R, D> = NamedSelector<S, R, [], D> & {
   path: Path;
 };
 
@@ -189,13 +189,13 @@ export const innerCreatePathSelector = (
 };
 
 export function createPathSelector<S, R, P = void>(
-  baseSelector: P extends void ? Selector<S, R> : ParametricSelector<S, P, R>,
+  baseSelector: P extends void ? Selector<S, R> : Selector<S, R, [P]>,
 ): P extends void
   ? IsOptional<R> extends true
     ? OptionalPathSelectorType<S, R, [Selector<S, R>]>
     : RequiredPathSelectorType<S, R, [Selector<S, R>]>
   : IsOptional<R> extends true
-    ? OptionalPathParametricSelectorType<S, P, R, [ParametricSelector<S, P, R>]>
-    : RequiredPathParametricSelectorType<S, P, R, [ParametricSelector<S, P, R>]> {
+    ? OptionalPathParametricSelectorType<S, P, R, [Selector<S, R, [P]>]>
+    : RequiredPathParametricSelectorType<S, P, R, [Selector<S, R, [P]>]> {
   return innerCreatePathSelector(baseSelector as (...args: unknown[]) => unknown) as any;
 }

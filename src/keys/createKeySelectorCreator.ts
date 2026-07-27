@@ -1,4 +1,4 @@
-import { KeySelector, ParametricKeySelector } from '@veksa/re-reselect';
+import { KeySelector } from '../_reReselect';
 import { isPropSelector } from '../createPropSelector';
 import { isComposedKeySelector, KeySelectorComposer } from './createKeySelectorComposer';
 import { arePathsEqual } from '../_helpers/arePathsEqual';
@@ -17,7 +17,7 @@ const areSelectorsEqual = (selector: unknown, another: unknown) => {
   return false;
 };
 
-const flatKeySelectors = <S, P>(keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[]) => {
+const flatKeySelectors = <S>(keySelectors: KeySelector<S>[]) => {
   const result: typeof keySelectors = [];
 
   for (let i = 0; i < keySelectors.length; i += 1) {
@@ -33,7 +33,7 @@ const flatKeySelectors = <S, P>(keySelectors: (KeySelector<S> | ParametricKeySel
   return result;
 };
 
-const uniqKeySelectors = <S, P>(keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[]) => {
+const uniqKeySelectors = <S>(keySelectors: KeySelector<S>[]) => {
   const result: typeof keySelectors = [];
 
   for (let i = 0; i < keySelectors.length; i += 1) {
@@ -50,9 +50,7 @@ const uniqKeySelectors = <S, P>(keySelectors: (KeySelector<S> | ParametricKeySel
   return result;
 };
 
-export const excludeDefaultSelectors = <S, P>(
-  keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[],
-) => {
+export const excludeDefaultSelectors = <S>(keySelectors: KeySelector<S>[]) => {
   const result: typeof keySelectors = [];
 
   for (let i = 0; i < keySelectors.length; i += 1) {
@@ -68,30 +66,21 @@ export const excludeDefaultSelectors = <S, P>(
 
 export function createKeySelectorCreator(
   keySelectorComposer: KeySelectorComposer,
-): <S, D>(selectorInputs: { inputSelectors: D; keySelector?: KeySelector<S> }) => KeySelector<S>;
-
-export function createKeySelectorCreator(
-  keySelectorComposer: KeySelectorComposer,
-): <S, P, D>(selectorInputs: {
-  inputSelectors: D;
-  keySelector?: ParametricKeySelector<S, P>;
-}) => ParametricKeySelector<S, P>;
-
-export function createKeySelectorCreator(keySelectorComposer: KeySelectorComposer) {
-  return <S, P>({
+): <S, D>(selectorInputs: { inputSelectors: D; keySelector?: KeySelector<S> }) => KeySelector<S> {
+  return <S>({
     inputSelectors,
     keySelector,
   }: {
-    inputSelectors: unknown[];
-    keySelector?: KeySelector<S> | ParametricKeySelector<S, P>;
+    inputSelectors: unknown;
+    keySelector?: KeySelector<S>;
   }) => {
-    let keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[] = [];
+    let keySelectors: KeySelector<S>[] = [];
 
     if (keySelector) {
       keySelectors.push(keySelector);
     }
 
-    inputSelectors.forEach((selector) => {
+    (inputSelectors as unknown[]).forEach((selector) => {
       if (isCachedSelector(selector)) {
         keySelectors.push(selector.keySelector);
       }
@@ -110,6 +99,8 @@ export function createKeySelectorCreator(keySelectorComposer: KeySelectorCompose
       return resultSelector;
     }
 
-    return keySelectorComposer(...keySelectors);
+    // The composer infers a `UnionToIntersection` state from the runtime array,
+    // which TS can't see as identical to `S`; narrow it back for the caller.
+    return keySelectorComposer(...keySelectors) as KeySelector<S>;
   };
 }

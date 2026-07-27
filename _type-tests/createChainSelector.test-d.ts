@@ -1,5 +1,5 @@
 import { expectTypeOf } from 'expect-type';
-import { Selector, ParametricSelector } from '@veksa/re-reselect';
+import { Selector } from '@veksa/reselect';
 import { createChainSelector } from '../src/index';
 import { Person, PersonProps, State } from './models';
 
@@ -36,7 +36,7 @@ const getPersonById = createChainSelector((state: State, props: PersonProps) => 
   .chain((personId) => (state: State) => state.persons.data[personId])
   .build();
 
-expectTypeOf(getPersonById).toExtend<ParametricSelector<State, PersonProps, Person>>();
+expectTypeOf(getPersonById).toExtend<Selector<State, Person, [PersonProps]>>();
 expectTypeOf(getPersonById(stateFixture, { personId: 1 })).toEqualTypeOf<Person>();
 
 // `map` also works on parametric chains

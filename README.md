@@ -229,14 +229,11 @@ const profile = getUserProfile(state, '123');
 ### Key Selector Composition
 
 ```typescript
-import { createKeySelectorCreator, stringComposeKeySelectors } from '@veksa/reselect-utils';
+import { stringComposeKeySelectors } from '@veksa/reselect-utils';
 
-const createKeySelector = createKeySelectorCreator(
-  stringComposeKeySelectors,
-  (a, b) => `${a}:${b}`,
-);
-
-const keySelector = createKeySelector(
+// Compose several key selectors into a single one. `stringComposeKeySelectors`
+// joins the composed keys with `:`.
+const keySelector = stringComposeKeySelectors(
   (state, props) => props.userId,
   (state, props) => props.view,
 );
@@ -265,7 +262,7 @@ Transforms the output of the previous selector by creating a new selector based 
 
 ```typescript
 chain<S2, R2>(fn: (result: R1) => Selector<S2, R2>, options?: ChainSelectorOptions): SelectorMonad
-chain<S2, P2, R2>(fn: (result: R1) => ParametricSelector<S2, P2, R2>, options?: ChainSelectorOptions): SelectorMonad
+chain<S2, P2, R2>(fn: (result: R1) => Selector<S2, R2, [P2]>, options?: ChainSelectorOptions): SelectorMonad
 ```
 
 - **fn** - Function that receives the previous selector's result and returns a new selector
@@ -319,7 +316,7 @@ map<R2>(fn: (result: R1) => R2, options?: ChainSelectorOptions): SelectorMonad
 Completes the chain and returns the final selector function that can be used in components.
 
 ```typescript
-build(): Selector | ParametricSelector
+build(): Selector<S, R, Params>
 ```
 
 #### createPathSelector
