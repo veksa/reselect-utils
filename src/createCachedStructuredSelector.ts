@@ -1,9 +1,4 @@
-import {
-  createSelector,
-  Selector,
-  SelectorResultsMap,
-  SelectorsObject,
-} from '@veksa/reselect';
+import { createSelector, Selector, SelectorResultsMap, SelectorsObject } from '@veksa/reselect';
 import { createCachedSelector, PolymorphicCachedOptions } from './_reReselect';
 import { createStructuredSelector } from './createStructuredSelector';
 

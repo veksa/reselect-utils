@@ -142,13 +142,11 @@ export interface CreateCachedSelectorImpl<StateType = any> {
  * The full `createCachedSelector` surface: callable signatures plus the
  * `withTypes` helper for pre-typing the state.
  */
-export interface CreateCachedSelector<StateType = any>
-  extends CreateCachedSelectorImpl<StateType> {
+export interface CreateCachedSelector<StateType = any> extends CreateCachedSelectorImpl<StateType> {
   withTypes: <OverrideStateType extends StateType>() => CreateCachedSelector<OverrideStateType>;
 }
 
-export const createCachedSelector =
-  legacyCreateCachedSelector as unknown as CreateCachedSelector;
+export const createCachedSelector = legacyCreateCachedSelector as unknown as CreateCachedSelector;
 
 export const FlatObjectCache = legacyFlatObjectCache;
 export const FlatMapCache = legacyFlatMapCache;

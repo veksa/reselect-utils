@@ -35,11 +35,9 @@ type ComposedProps<Ks extends readonly AnyKeySelector[]> = [PropsUnion<Ks>] exte
  * intersects the `state` (and `props`, when any input is parametric) of every
  * composed key selector, tagged with the original inputs as `dependencies`.
  */
-export type OutputKeySelector<
-  S,
-  P,
-  D extends readonly AnyKeySelector[],
-> = ([P] extends [never] ? (state: S) => unknown : (state: S, props: P) => unknown) & {
+export type OutputKeySelector<S, P, D extends readonly AnyKeySelector[]> = ([P] extends [never]
+  ? (state: S) => unknown
+  : (state: S, props: P) => unknown) & {
   dependencies: D;
 };
 
