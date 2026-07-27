@@ -127,7 +127,6 @@ describe('createAdaptedSelector', () => {
             );
             expect(selectorInstance).toBeInstanceOf(Function);
 
-            // eslint-disable-next-line no-unused-expressions
             fullNameAdaptedCachedSelector.removeMatchingSelector?.(commonState, {
                 personId: 1,
             });

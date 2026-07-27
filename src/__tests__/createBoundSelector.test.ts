@@ -85,7 +85,6 @@ describe('createBoundSelector', () => {
 
         const boundSelector: never = createBoundSelector(selector, wrongProps);
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         boundSelector(commonState, {});
     });
@@ -178,7 +177,6 @@ describe('createBoundSelector', () => {
             );
             expect(selectorInstance).toBeInstanceOf(Function);
 
-            // eslint-disable-next-line no-unused-expressions
             marrySelector.removeMatchingSelector?.(commonState, expect.anything());
             selectorInstance = marrySelector.getMatchingSelector?.(
                 commonState,

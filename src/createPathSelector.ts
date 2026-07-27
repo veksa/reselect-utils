@@ -13,7 +13,6 @@ export type IsOptional<T> = undefined extends T
         ? true
         : false;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export type IsObject<T> = T extends object ? true : false;
 
 export type PathSelector<S, R, D> = NamedSelector<S, R, D> & {
@@ -136,10 +135,8 @@ export const innerCreatePathSelector = (
     const proxyTarget = (defaultValue?: unknown) => {
         function resultSelector() {
             // performance optimisation
-            // eslint-disable-next-line prefer-spread
             let result = baseSelector.apply(
                 null,
-                // eslint-disable-next-line prefer-rest-params
                 (arguments as unknown) as unknown[],
             );
 

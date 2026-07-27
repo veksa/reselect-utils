@@ -2,11 +2,8 @@ import { shallowEqual, useSelector as useReduxSelector } from '@veksa/react-redu
 import { useMemoWith } from './useMemoWith';
 import { useCallback, useMemo } from 'react';
 
-/* eslint-disable etc/prefer-interface */
 export type Selector<S, R> = (state: S) => R;
 export type ParametricSelector<S, P, R> = (state: S, props: P, ...args: any[]) => R;
-
-/* eslint-enable */
 
 export function useSelector<S extends object, R>(
   selector: Selector<S, R>,
