@@ -12,17 +12,12 @@ export function createCachedSequenceSelector<S, R>(
 export function createCachedSequenceSelector<S, P, R>(
   selectors: ParametricSelector<S, P, R>[],
 ): (
-  options: ParametricOptions<
-    S,
-    P,
-    (...results: R[]) => R[],
-    ParametricSelector<S, P, R>[]
-  >,
+  options: ParametricOptions<S, P, (...results: R[]) => R[], ParametricSelector<S, P, R>[]>,
 ) => ParametricSelector<S, P, R[]>;
 
 export function createCachedSequenceSelector(selectors: any): any {
   return createSequenceSelector(
     selectors,
-    (createCachedSelector as unknown) as typeof createSelector,
+    createCachedSelector as unknown as typeof createSelector,
   );
 }

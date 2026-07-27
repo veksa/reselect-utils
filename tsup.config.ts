@@ -1,7 +1,7 @@
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import type { Options } from 'tsup'
-import { defineConfig } from 'tsup'
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import type { Options } from 'tsup';
+import { defineConfig } from 'tsup';
 
 async function writeCommonJSEntry() {
   await fs.writeFile(
@@ -11,20 +11,20 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = require('./reselectUtils.production.min.cjs')
 } else {
   module.exports = require('./reselectUtils.development.cjs')
-}`
-  )
+}`,
+  );
 }
 
 export default defineConfig((options): Options[] => {
   const commonOptions: Options = {
     entry: {
-      reselectUtils: 'src/index.ts'
+      reselectUtils: 'src/index.ts',
     },
     sourcemap: true,
     target: ['esnext'],
     clean: true,
-    ...options
-  }
+    ...options,
+  };
 
   return [
     {
@@ -32,43 +32,43 @@ export default defineConfig((options): Options[] => {
       name: 'Modern ESM',
       target: ['es2019'],
       format: ['esm'],
-      outExtension: () => ({ js: '.mjs' })
+      outExtension: () => ({ js: '.mjs' }),
     },
     {
       ...commonOptions,
       name: 'CJS Development',
       entry: {
-        'reselectUtils.development': 'src/index.ts'
+        'reselectUtils.development': 'src/index.ts',
       },
       env: {
-        NODE_ENV: 'development'
+        NODE_ENV: 'development',
       },
       format: ['cjs'],
       outDir: './dist/cjs/',
-      outExtension: () => ({ js: '.cjs' })
+      outExtension: () => ({ js: '.cjs' }),
     },
     {
       ...commonOptions,
       name: 'CJS production',
       entry: {
-        'reselectUtils.production.min': 'src/index.ts'
+        'reselectUtils.production.min': 'src/index.ts',
       },
       env: {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
       },
       format: ['cjs'],
       outDir: './dist/cjs/',
       outExtension: () => ({ js: '.cjs' }),
       minify: true,
       onSuccess: async () => {
-        await writeCommonJSEntry()
-      }
+        await writeCommonJSEntry();
+      },
     },
     {
       ...commonOptions,
       name: 'CJS Type Definitions',
       format: ['cjs'],
-      dts: { only: true }
-    }
-  ]
-})
+      dts: { only: true },
+    },
+  ];
+});

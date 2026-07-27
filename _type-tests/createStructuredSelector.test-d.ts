@@ -24,9 +24,7 @@ const parametricStructuredSelector = createStructuredSelector({
   personId: (state: State, props: PersonProps) => props.personId,
 });
 
-expectTypeOf(
-  parametricStructuredSelector(stateFixture, { personId: 1 }),
-).toEqualTypeOf<{
+expectTypeOf(parametricStructuredSelector(stateFixture, { personId: 1 })).toEqualTypeOf<{
   person: Person;
   personId: number;
 }>();

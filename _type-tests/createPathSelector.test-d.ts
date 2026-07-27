@@ -56,24 +56,27 @@ const getPerson = createPathSelector(
 
 const personIdSelector = getPerson.id();
 expectTypeOf(
-  personIdSelector({ persons: { data: {} }, messages: { data: {} } }, {
-    personId: 1,
-  }),
+  personIdSelector(
+    { persons: { data: {} }, messages: { data: {} } },
+    {
+      personId: 1,
+    },
+  ),
 ).toEqualTypeOf<number>();
 
 const firstNameSelector = getPerson.firstName();
 expectTypeOf(
-  firstNameSelector({ persons: { data: {} }, messages: { data: {} } }, {
-    personId: 1,
-  }),
+  firstNameSelector(
+    { persons: { data: {} }, messages: { data: {} } },
+    {
+      personId: 1,
+    },
+  ),
 ).toEqualTypeOf<string>();
 
 // a cached base selector stays parametric through the path selector
 const cachedPersonSelector = createCachedSelector(
-  [
-    (state: State) => state.persons,
-    (state: State, props: PersonProps) => props.personId,
-  ],
+  [(state: State) => state.persons, (state: State, props: PersonProps) => props.personId],
   (persons, personId) => persons.data[personId],
 )({
   keySelector: (state: State, props: PersonProps) => props.personId,
@@ -81,7 +84,10 @@ const cachedPersonSelector = createCachedSelector(
 
 const cachedFirstNameSelector = createPathSelector(cachedPersonSelector).firstName();
 expectTypeOf(
-  cachedFirstNameSelector({ persons: { data: {} }, messages: { data: {} } }, {
-    personId: 1,
-  }),
+  cachedFirstNameSelector(
+    { persons: { data: {} }, messages: { data: {} } },
+    {
+      personId: 1,
+    },
+  ),
 ).toEqualTypeOf<string>();

@@ -23,8 +23,7 @@ expectTypeOf(plainCachedSelector(stateFixture)).toEqualTypeOf<{
 // parametric structured selector keeps the props type and maps the result shape
 const cachedSelector = createCachedStructuredSelector({
   person: (state: State, props: PersonProps) => state.persons.data[props.personId],
-  currentMessage: (state: State) =>
-    state.messages.data[state.messages.currentMessageId ?? 0],
+  currentMessage: (state: State) => state.messages.data[state.messages.currentMessageId ?? 0],
 })({
   keySelector: (state, props) => props.personId,
 });

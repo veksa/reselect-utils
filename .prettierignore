@@ -1,8 +1,0 @@
-.git/
-.docz/
-site/
-coverage/
-examples/*/dist/
-packages/*/dist/
-packages/*/es/
-packages/*/lib/

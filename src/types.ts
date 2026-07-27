@@ -16,11 +16,7 @@ export type NamedSelector<S, R, D = any[]> = Selector<S, R> & {
   dependencies?: D;
 };
 
-export type NamedParametricSelector<S, P, R, D = any[]> = ParametricSelector<
-  S,
-  P,
-  R
-> & {
+export type NamedParametricSelector<S, P, R, D = any[]> = ParametricSelector<S, P, R> & {
   selectorName?: string;
   dependencies?: D;
 };

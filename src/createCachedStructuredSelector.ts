@@ -14,19 +14,19 @@ export function createCachedStructuredSelector<M>(
       >,
     ) => Selector<S, { [K in keyof M]: ReturnType<M[K]> }, never>
   : M extends { [K in keyof M]: ParametricSelector<infer S, infer P, unknown> }
-  ? (
-      options: ParametricOptions<
-        S,
-        P,
-        (...results: unknown[]) => { [K in keyof M]: ReturnType<M[K]> },
-        ParametricSelector<S, P, unknown>[]
-      >,
-    ) => ParametricSelector<S, P, { [K in keyof M]: ReturnType<M[K]> }>
-  : never;
+    ? (
+        options: ParametricOptions<
+          S,
+          P,
+          (...results: unknown[]) => { [K in keyof M]: ReturnType<M[K]> },
+          ParametricSelector<S, P, unknown>[]
+        >,
+      ) => ParametricSelector<S, P, { [K in keyof M]: ReturnType<M[K]> }>
+    : never;
 
 export function createCachedStructuredSelector(selectors: any): any {
   return createStructuredSelector(
     selectors,
-    (createCachedSelector as unknown) as typeof createSelector,
+    createCachedSelector as unknown as typeof createSelector,
   );
 }

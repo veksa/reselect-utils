@@ -46,19 +46,16 @@ import { createSelector } from '@veksa/reselect';
 
 const getUser = (state) => state.user;
 
-const getUserAddress = createSelector(
-  getUser,
-  (user) => {
-    // Need null checks at each level
-    if (user && user.contact && user.contact.address) {
-      return user.contact.address;
-    }
-    return undefined;
+const getUserAddress = createSelector(getUser, (user) => {
+  // Need null checks at each level
+  if (user && user.contact && user.contact.address) {
+    return user.contact.address;
   }
-);
+  return undefined;
+});
 
 // Usage:
-const address = getUserAddress(state);  // May be undefined
+const address = getUserAddress(state); // May be undefined
 ```
 
 With standard @veksa/reselect, you need to handle potential null/undefined values at each level with conditional checks.
@@ -72,18 +69,14 @@ const getUser = (state) => state.user;
 const getUserId = (state, userId) => userId;
 
 // Using re-reselect for caching by userId
-const getUserAddressByUserId = createCachedSelector(
-  getUser,
-  getUserId,
-  (user, userId) => {
-    // Still need null checks for nested properties
-    const targetUser = user[userId];
-    if (targetUser && targetUser.contact && targetUser.contact.address) {
-      return targetUser.contact.address;
-    }
-    return undefined;
+const getUserAddressByUserId = createCachedSelector(getUser, getUserId, (user, userId) => {
+  // Still need null checks for nested properties
+  const targetUser = user[userId];
+  if (targetUser && targetUser.contact && targetUser.contact.address) {
+    return targetUser.contact.address;
   }
-)((state, userId) => userId);
+  return undefined;
+})((state, userId) => userId);
 
 // Usage with better caching by userId:
 const address = getUserAddressByUserId(state, '123');
@@ -97,18 +90,14 @@ const address = getUserAddressByUserId(state, '123');
 import { createPathSelector } from '@veksa/reselect-utils';
 
 // Clean path selection with built-in null handling
-const getUser = createPathSelector(
-  (state) => state.user,
-);
+const getUser = createPathSelector((state) => state.user);
 
 // For parametric selectors
-const getUserByUserId = createPathSelector(
-  (state, userId) => state.users?.[userId],
-);
+const getUserByUserId = createPathSelector((state, userId) => state.users?.[userId]);
 
 // Usage:
-const address = getUser(state).address();  // Safely returns undefined if path is broken
-const userAddress = getUserByUserId(state, '123').address();  // With parameters
+const address = getUser(state).address(); // Safely returns undefined if path is broken
+const userAddress = getUserByUserId(state, '123').address(); // With parameters
 ```
 
 @veksa/reselect-utils provides safer property access with path selectors that handle null/undefined values automatically.
@@ -128,9 +117,12 @@ interface IUserSegment {
   user: IUserStore;
 }
 
-const defaultUser: IUserStore = {address: 'Default address'};
+const defaultUser: IUserStore = { address: 'Default address' };
 
-const getUserSegment = createSegmentSelector<IUserSegment, IUserStore>(state => state.user, defaultUser);
+const getUserSegment = createSegmentSelector<IUserSegment, IUserStore>(
+  (state) => state.user,
+  defaultUser,
+);
 ```
 
 #### Path Selector
@@ -144,7 +136,7 @@ const state = {
   },
 };
 
-const getUserAddress = createPathSelector(state => state.user).address();
+const getUserAddress = createPathSelector((state) => state.user).address();
 ```
 
 #### Prop Selector
@@ -152,7 +144,7 @@ const getUserAddress = createPathSelector(state => state.user).address();
 ```typescript
 import { createPropSelector } from '@veksa/reselect-utils';
 
-const getUserIdFromProps = createPropSelector<{userId: number}>().userId();
+const getUserIdFromProps = createPropSelector<{ userId: number }>().userId();
 ```
 
 #### Bound Selector
@@ -162,15 +154,12 @@ import { createSelector } from '@veksa/reselect';
 import { createBoundSelector } from '@veksa/reselect-utils';
 
 const getUserByName = createSelector(
-  state => state.users,
+  (state) => state.users,
   (state, props) => props.userName,
   (users, userName) => users[userName],
 );
 
-const getAdmin = createBoundSelector(
-  getUserByName,
-  {userName: 'admin'},
-);
+const getAdmin = createBoundSelector(getUserByName, { userName: 'admin' });
 
 // Usage:
 const admin = getAdmin(state); // Same as getUserByName(state, {userName: 'admin'})
@@ -183,16 +172,16 @@ import { createSelector } from '@veksa/reselect';
 import { createAdaptedSelector } from '@veksa/reselect-utils';
 
 const getUserByNameAndRole = createSelector(
-  state => state.users,
+  (state) => state.users,
   (state, props) => props.userName,
   (state, props) => props.userRole,
   (users, userName, userRole) => users[userName][userRole],
 );
 
-const getAdmin = createAdaptedSelector(
-  getUserByNameAndRole,
-  props => ({userName: props.userName, userRole: 'admin'}),
-);
+const getAdmin = createAdaptedSelector(getUserByNameAndRole, (props) => ({
+  userName: props.userName,
+  userRole: 'admin',
+}));
 
 // Usage:
 const admin = getAdmin(state); // Same as getUserByName(state, {userName: 'admin'})
@@ -204,12 +193,12 @@ const admin = getAdmin(state); // Same as getUserByName(state, {userName: 'admin
 import { createChainSelector } from '@veksa/reselect-utils';
 
 // Create a base selector
-const getUserData = state => state.users;
+const getUserData = (state) => state.users;
 
 // Build a selector chain
 const getActiveUserEmails = createChainSelector(getUserData)
-  .map(users => users.filter(user => user.active))
-  .map(activeUsers => activeUsers.map(user => user.email))
+  .map((users) => users.filter((user) => user.active))
+  .map((activeUsers) => activeUsers.map((user) => user.email))
   .build();
 
 // Usage:
@@ -224,12 +213,12 @@ const activeEmails = getActiveUserEmails(state); // ['alice@example.com', 'bob@e
 import { createCachedStructuredSelector } from '@veksa/reselect-utils';
 
 const getUserProfile = createCachedStructuredSelector({
-  name: state => state.user.name,
-  email: state => state.user.email,
+  name: (state) => state.user.name,
+  email: (state) => state.user.email,
   address: createPathSelector(
-    state => state.user,
-    user => user?.contact?.address
-  )
+    (state) => state.user,
+    (user) => user?.contact?.address,
+  ),
 })((state, userId) => userId);
 
 // Usage:
@@ -244,12 +233,12 @@ import { createKeySelectorCreator, stringComposeKeySelectors } from '@veksa/rese
 
 const createKeySelector = createKeySelectorCreator(
   stringComposeKeySelectors,
-  (a, b) => `${a}:${b}`
+  (a, b) => `${a}:${b}`,
 );
 
 const keySelector = createKeySelector(
   (state, props) => props.userId,
-  (state, props) => props.view
+  (state, props) => props.view,
 );
 
 // Usage:
@@ -261,17 +250,17 @@ const keySelector = createKeySelector(
 ### Core Functions
 
 #### createChainSelector
+
 Creates a selector that can be chained with map and chain methods.
 
 ```typescript
-createChainSelector(baseSelector)
-  .map(transformFn)
-  .build();
+createChainSelector(baseSelector).map(transformFn).build();
 ```
 
 ##### ChainSelector Methods
 
 ###### chain
+
 Transforms the output of the previous selector by creating a new selector based on its result. This is where the real power of chain selectors comes in, allowing composition of selectors where the output of one becomes the context for creating the next.
 
 ```typescript
@@ -286,38 +275,39 @@ chain<S2, P2, R2>(fn: (result: R1) => ParametricSelector<S2, P2, R2>, options?: 
 
 ```typescript
 // Basic chaining - transform one selector's result into another selector
-const userWithDetails = createChainSelector(state => state.users)
-  .chain(users => (state) => {
+const userWithDetails = createChainSelector((state) => state.users)
+  .chain((users) => (state) => {
     // This function receives the users result and returns a new selector
     const userIds = Object.keys(users);
-    return userIds.map(id => state.userDetails[id]);
+    return userIds.map((id) => state.userDetails[id]);
   })
   .build();
 
 // Parametric selectors with chain
 const getUserPostsById = createChainSelector(propSelector)
-  .chain(props => {
+  .chain((props) => {
     // Use the props to create a targeted selector
     return createSelector(
-      state => state.users[props.userId],
-      state => state.posts,
-      (user, posts) => posts.filter(post => post.authorId === user.id)
+      (state) => state.users[props.userId],
+      (state) => state.posts,
+      (user, posts) => posts.filter((post) => post.authorId === user.id),
     );
   })
   .build();
 
 // Multiple chains
-const getUserStats = createChainSelector(state => state.users)
-  .chain(users => state => Object.values(users).filter(user => user.active))
-  .chain(activeUsers => state => ({
+const getUserStats = createChainSelector((state) => state.users)
+  .chain((users) => (state) => Object.values(users).filter((user) => user.active))
+  .chain((activeUsers) => (state) => ({
     activeCount: activeUsers.length,
     totalCount: Object.keys(state.users).length,
-    activeRatio: activeUsers.length / Object.keys(state.users).length
+    activeRatio: activeUsers.length / Object.keys(state.users).length,
   }))
   .build();
 ```
 
 ###### map
+
 Transforms the output of the selector with a simple transformation function. Unlike `chain`, `map` doesn't create a new selector but just transforms the result of the current one.
 
 ```typescript
@@ -325,6 +315,7 @@ map<R2>(fn: (result: R1) => R2, options?: ChainSelectorOptions): SelectorMonad
 ```
 
 ###### build
+
 Completes the chain and returns the final selector function that can be used in components.
 
 ```typescript
@@ -332,6 +323,7 @@ build(): Selector | ParametricSelector
 ```
 
 #### createPathSelector
+
 Creates a selector that safely accesses nested properties.
 
 ```typescript
@@ -339,6 +331,7 @@ createPathSelector(sourceSelector, pathFn);
 ```
 
 #### createBoundSelector
+
 Creates a selector with predefined parameters.
 
 ```typescript
@@ -346,6 +339,7 @@ createBoundSelector(selector, getParams);
 ```
 
 #### createAdaptedSelector
+
 Adapts a selector to work with a different parameter shape.
 
 ```typescript
@@ -353,6 +347,7 @@ createAdaptedSelector(selector, paramsAdapter);
 ```
 
 #### createCachedStructuredSelector
+
 Creates a structured selector with caching support.
 
 ```typescript
@@ -360,6 +355,7 @@ createCachedStructuredSelector(selectors)(keySelector);
 ```
 
 #### createEmptySelector
+
 Creates a selector that always returns `undefined` regardless of input. Useful as a placeholder or for conditional selection logic.
 
 ```typescript
@@ -368,6 +364,7 @@ const emptySelector = createEmptySelector(baseSelector);
 ```
 
 #### createPropSelector
+
 Creates a selector that returns the props passed to it, enabling strongly-typed access to props in selector chains.
 
 ```typescript
@@ -376,31 +373,35 @@ const propSelector = createPropSelector();
 
 // In a chain
 const userByIdSelector = createChainSelector(propSelector)
-  .chain((props) => createPathSelector(
-    (state) => state.users[props.userId],
-    (user) => user
-  ))
+  .chain((props) =>
+    createPathSelector(
+      (state) => state.users[props.userId],
+      (user) => user,
+    ),
+  )
   .build();
 ```
 
 #### createSegmentSelector
+
 Creates a selector with a default/initial value when the selection returns null or undefined.
 
 ```typescript
 const getUserSettings = createSegmentSelector(
   (state) => state.userSettings,
-  { theme: 'light', notifications: true } // Default value if userSettings is null/undefined
+  { theme: 'light', notifications: true }, // Default value if userSettings is null/undefined
 );
 ```
 
 #### createSequenceSelector
+
 Creates a selector that returns an array of results from multiple selectors.
 
 ```typescript
 const getUserStats = createSequenceSelector([
   (state) => state.user.postsCount,
   (state) => state.user.followersCount,
-  (state) => state.user.likesCount
+  (state) => state.user.likesCount,
 ]);
 
 // Returns [postsCount, followersCount, likesCount]
@@ -417,7 +418,7 @@ import { TreeCache } from '@veksa/reselect-utils';
 
 // Create a TreeCache instance
 const cache = new TreeCache({
-  cacheObjectCreator: () => new FlatObjectCache() // Optional custom cache factory
+  cacheObjectCreator: () => new FlatObjectCache(), // Optional custom cache factory
 });
 
 // Use with complex keys (automatically normalized to arrays)
@@ -445,18 +446,18 @@ cache.set('key', selectorData);
 
 ### Comparing with @veksa/reselect and @veksa/re-reselect
 
-| Feature | @veksa/reselect | @veksa/re-reselect | @veksa/reselect-utils |
-|---------|-----------------|--------------------|-----------------------|
-| Basic memoization | ✓ | ✓ | ✓ (via dependencies) |
-| Parametric memoization | × | ✓ | ✓ (via dependencies) |
-| Safe nested property access | × | × | ✓ |
-| Fluent selector chains | × | × | ✓ |
-| Parameter binding | × | × | ✓ |
-| Parameter adaptation | × | × | ✓ |
-| Advanced key composition | × | Limited | ✓ |
-| Cache garbage collection | × | × | ✓ |
-| Hierarchical caching | × | × | ✓ |
-| Typescript support | ✓ | ✓ | ✓ (enhanced) |
+| Feature                     | @veksa/reselect | @veksa/re-reselect | @veksa/reselect-utils |
+| --------------------------- | --------------- | ------------------ | --------------------- |
+| Basic memoization           | ✓               | ✓                  | ✓ (via dependencies)  |
+| Parametric memoization      | ×               | ✓                  | ✓ (via dependencies)  |
+| Safe nested property access | ×               | ×                  | ✓                     |
+| Fluent selector chains      | ×               | ×                  | ✓                     |
+| Parameter binding           | ×               | ×                  | ✓                     |
+| Parameter adaptation        | ×               | ×                  | ✓                     |
+| Advanced key composition    | ×               | Limited            | ✓                     |
+| Cache garbage collection    | ×               | ×                  | ✓                     |
+| Hierarchical caching        | ×               | ×                  | ✓                     |
+| Typescript support          | ✓               | ✓                  | ✓ (enhanced)          |
 
 ## Contributing
 

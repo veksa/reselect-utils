@@ -5,14 +5,8 @@
     "outDir": "./dist",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": [
-      "dom",
-      "es2020"
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "types"
-    ],
+    "lib": ["dom", "es2020"],
+    "typeRoots": ["node_modules/@types", "types"],
     "strict": true,
     "esModuleInterop": true,
     "importHelpers": true,
@@ -25,7 +19,5 @@
     "preserveConstEnums": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

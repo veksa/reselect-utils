@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "12"
+  - '12'
 script:
   - yarn workspaces run build
   - yarn lint
@@ -10,7 +10,7 @@ after_success:
   - cat ./coverage/lcov.info | yarn coveralls
 cache:
   directories:
-    - "node_modules"
+    - 'node_modules'
 before_deploy:
   - yarn site
 deploy:

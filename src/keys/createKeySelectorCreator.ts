@@ -17,9 +17,7 @@ const areSelectorsEqual = (selector: unknown, another: unknown) => {
   return false;
 };
 
-const flatKeySelectors = <S, P>(
-  keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[],
-) => {
+const flatKeySelectors = <S, P>(keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[]) => {
   const result: typeof keySelectors = [];
 
   for (let i = 0; i < keySelectors.length; i += 1) {
@@ -35,9 +33,7 @@ const flatKeySelectors = <S, P>(
   return result;
 };
 
-const uniqKeySelectors = <S, P>(
-  keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[],
-) => {
+const uniqKeySelectors = <S, P>(keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[]) => {
   const result: typeof keySelectors = [];
 
   for (let i = 0; i < keySelectors.length; i += 1) {
@@ -72,10 +68,7 @@ export const excludeDefaultSelectors = <S, P>(
 
 export function createKeySelectorCreator(
   keySelectorComposer: KeySelectorComposer,
-): <S, D>(selectorInputs: {
-  inputSelectors: D;
-  keySelector?: KeySelector<S>;
-}) => KeySelector<S>;
+): <S, D>(selectorInputs: { inputSelectors: D; keySelector?: KeySelector<S> }) => KeySelector<S>;
 
 export function createKeySelectorCreator(
   keySelectorComposer: KeySelectorComposer,
@@ -84,13 +77,11 @@ export function createKeySelectorCreator(
   keySelector?: ParametricKeySelector<S, P>;
 }) => ParametricKeySelector<S, P>;
 
-export function createKeySelectorCreator(
-  keySelectorComposer: KeySelectorComposer,
-) {
+export function createKeySelectorCreator(keySelectorComposer: KeySelectorComposer) {
   return <S, P>({
-                  inputSelectors,
-                  keySelector,
-                }: {
+    inputSelectors,
+    keySelector,
+  }: {
     inputSelectors: unknown[];
     keySelector?: KeySelector<S> | ParametricKeySelector<S, P>;
   }) => {

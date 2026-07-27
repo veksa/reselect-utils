@@ -5,10 +5,7 @@ import { PersonState, State } from './models';
 const defaultPersonState: PersonState = { data: {} };
 
 // selects a nested segment of the state (State[keyof State] overload)
-const getPersons = createSegmentSelector(
-  (state: State) => state.persons,
-  defaultPersonState,
-);
+const getPersons = createSegmentSelector((state: State) => state.persons, defaultPersonState);
 
 expectTypeOf(getPersons).toEqualTypeOf<(state: State) => PersonState>();
 expectTypeOf(getPersons).parameter(0).toEqualTypeOf<State>();

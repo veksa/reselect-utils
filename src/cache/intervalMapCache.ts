@@ -16,7 +16,7 @@ const runGarbageCollector = () => {
 
     for (let j = 0; j < keys.length; j++) {
       if (cache[ids[i]][keys[j]]) {
-        if ((currentTime - cache[ids[i]][keys[j]].time) > cacheLifetime) {
+        if (currentTime - cache[ids[i]][keys[j]].time > cacheLifetime) {
           delete cache[ids[i]][keys[j]];
         }
       }

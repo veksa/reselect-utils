@@ -5,9 +5,7 @@ import { useCallback, useMemo } from 'react';
 export type Selector<S, R> = (state: S) => R;
 export type ParametricSelector<S, P, R> = (state: S, props: P, ...args: any[]) => R;
 
-export function useSelector<S extends object, R>(
-  selector: Selector<S, R>,
-): R;
+export function useSelector<S extends object, R>(selector: Selector<S, R>): R;
 
 export function useSelector<S extends object, P extends object, R>(
   selector: ParametricSelector<S, P, R>,
@@ -19,14 +17,15 @@ export function useSelector(selector: Function, props?: any) {
 
   // unfreeze props for performance optimization (see temporaryAssign.ts)
   const unfrozenProps = useMemo(() => {
-    return Object.isFrozen(memoizedProps)
-      ? {...memoizedProps}
-      : memoizedProps;
+    return Object.isFrozen(memoizedProps) ? { ...memoizedProps } : memoizedProps;
   }, [memoizedProps]);
 
-  const memoizedPropsSelector = useCallback((state: unknown) => {
-    return selector(state, unfrozenProps);
-  }, [selector, unfrozenProps]);
+  const memoizedPropsSelector = useCallback(
+    (state: unknown) => {
+      return selector(state, unfrozenProps);
+    },
+    [selector, unfrozenProps],
+  );
 
   return useReduxSelector(memoizedPropsSelector, {
     devModeChecks: {

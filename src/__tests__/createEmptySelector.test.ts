@@ -41,8 +41,8 @@ describe('createEmptySelector', () => {
       .chain(({ parentId }) =>
         parentId !== undefined
           ? createBoundSelector(parentSelector, {
-            parentId,
-          })
+              parentId,
+            })
           : createEmptySelector(parentSelector),
       )
       .build();
@@ -80,9 +80,7 @@ describe('createEmptySelector', () => {
     });
 
     test('should produce cached selector if input selector is cached', () => {
-      const emptyParentCachedSelector = createEmptySelector(
-        parentCachedSelector,
-      );
+      const emptyParentCachedSelector = createEmptySelector(parentCachedSelector);
 
       expect(isCachedSelector(emptyParentCachedSelector)).toBeTruthy();
 

@@ -20,9 +20,5 @@ const parametricBaseSelector = (state: State, props: PersonProps) =>
   state.persons.data[props.personId];
 const emptyFromParametric = createEmptySelector(parametricBaseSelector);
 
-expectTypeOf(emptyFromParametric).toEqualTypeOf<
-  Selector<State, Person | undefined>
->();
-expectTypeOf(emptyFromParametric(stateFixture)).toEqualTypeOf<
-  Person | undefined
->();
+expectTypeOf(emptyFromParametric).toEqualTypeOf<Selector<State, Person | undefined>>();
+expectTypeOf(emptyFromParametric(stateFixture)).toEqualTypeOf<Person | undefined>();

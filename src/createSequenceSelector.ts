@@ -11,9 +11,6 @@ export function createSequenceSelector<S, P, R>(
   selectorCreator?: typeof createSelector,
 ): ParametricSelector<S, P, R[]>;
 
-export function createSequenceSelector(
-  selectors: any,
-  selectorCreator = createSelector,
-) {
+export function createSequenceSelector(selectors: any, selectorCreator = createSelector) {
   return selectorCreator(selectors, (...results) => results);
 }

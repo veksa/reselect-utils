@@ -1,4 +1,4 @@
-import {temporaryAssign} from '../temporaryAssign';
+import { temporaryAssign } from '../temporaryAssign';
 
 describe('temporaryAssign', () => {
   test('should delete field if it was not in target object', () => {
@@ -10,7 +10,7 @@ describe('temporaryAssign', () => {
       field2: 'second value',
     };
 
-    const {rollback} = temporaryAssign(target, source);
+    const { rollback } = temporaryAssign(target, source);
 
     const expected = {
       field1: 'another value',
@@ -38,7 +38,7 @@ describe('temporaryAssign', () => {
       field2: 'second value',
     };
 
-    const {rollback} = temporaryAssign(target, source);
+    const { rollback } = temporaryAssign(target, source);
 
     const expected = {
       field1: 'another value',

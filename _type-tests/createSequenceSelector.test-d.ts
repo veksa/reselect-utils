@@ -34,6 +34,4 @@ const getParametricNumbers = createSequenceSelector<State, PersonProps, number>(
 expectTypeOf(getParametricNumbers).toEqualTypeOf<
   ParametricSelector<State, PersonProps, number[]>
 >();
-expectTypeOf(getParametricNumbers(stateFixture, { personId: 1 })).toEqualTypeOf<
-  number[]
->();
+expectTypeOf(getParametricNumbers(stateFixture, { personId: 1 })).toEqualTypeOf<number[]>();

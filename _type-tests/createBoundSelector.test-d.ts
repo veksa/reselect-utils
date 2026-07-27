@@ -8,10 +8,8 @@ const stateFixture: State = {
   messages: { data: {} },
 };
 
-const personSelector = (
-  state: State,
-  props: { personId: number },
-): Person | undefined => state.persons.data[props.personId];
+const personSelector = (state: State, props: { personId: number }): Person | undefined =>
+  state.persons.data[props.personId];
 
 // binding every prop turns the selector into a plain one
 const boundSelector = createBoundSelector(personSelector, { personId: 1 });
@@ -32,9 +30,9 @@ const partiallyBoundSelector = createBoundSelector(twoPropsSelector, {
 expectTypeOf(partiallyBoundSelector).toExtend<
   ParametricSelector<State, { messageId: number }, Person | undefined>
 >();
-expectTypeOf(
-  partiallyBoundSelector(stateFixture, { messageId: 100 }),
-).toEqualTypeOf<Person | undefined>();
+expectTypeOf(partiallyBoundSelector(stateFixture, { messageId: 100 })).toEqualTypeOf<
+  Person | undefined
+>();
 
 // a custom binding options object is accepted
 const boundWithOptions = createBoundSelector(

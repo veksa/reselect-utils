@@ -8,17 +8,11 @@ const stateFixture: State = {
 };
 
 // parametric cached sequence selector returns an array of the results
-const cachedSequenceSelector = createCachedSequenceSelector<
-  State,
-  PersonProps,
-  number
->([
+const cachedSequenceSelector = createCachedSequenceSelector<State, PersonProps, number>([
   (state, props) => props.personId,
   (state) => state.persons.currentPersonId ?? 0,
 ])({
   keySelector: (state, props) => props.personId,
 });
 
-expectTypeOf(
-  cachedSequenceSelector(stateFixture, { personId: 1 }),
-).toEqualTypeOf<number[]>();
+expectTypeOf(cachedSequenceSelector(stateFixture, { personId: 1 })).toEqualTypeOf<number[]>();

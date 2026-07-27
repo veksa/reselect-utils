@@ -29,10 +29,7 @@ expectTypeOf(composedKeySelector).toExtend<
   ParametricKeySelector<State, PersonProps & MessageProps>
 >();
 expectTypeOf(composedKeySelector.dependencies).toEqualTypeOf<
-  [
-    ParametricKeySelector<State, PersonProps>,
-    ParametricKeySelector<State, MessageProps>,
-  ]
+  [ParametricKeySelector<State, PersonProps>, ParametricKeySelector<State, MessageProps>]
 >();
 
 // composing three parametric key selectors keeps intersecting the props types
@@ -58,9 +55,7 @@ const arrayComposed = arrayComposeKeySelectors(
   (state: State, props: PersonProps) => props.personId,
   (state: State, props: MessageProps) => props.messageId,
 );
-expectTypeOf(arrayComposed).toExtend<
-  ParametricKeySelector<State, PersonProps & MessageProps>
->();
+expectTypeOf(arrayComposed).toExtend<ParametricKeySelector<State, PersonProps & MessageProps>>();
 
 // a custom composer can be built from a base composer
 const customComposer = createKeySelectorComposer(

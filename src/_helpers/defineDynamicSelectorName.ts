@@ -1,7 +1,4 @@
-export const defineDynamicSelectorName = (
-  selector: unknown,
-  selectorNameGetter: () => string,
-) => {
+export const defineDynamicSelectorName = (selector: unknown, selectorNameGetter: () => string) => {
   let overriddenSelectorName: string;
   Object.defineProperty(selector, 'selectorName', {
     configurable: true,

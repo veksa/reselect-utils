@@ -31,14 +31,12 @@ const generateBindingName = <P extends object>(binding: P) => {
 /**
  * The special type to prevent binding of non optional props on optional values
  */
-export type BoundSelector<S, P2, P1 extends Partial<P2>, R> = P2 extends Pick<
-    P1,
-    keyof P2
-  >
-  ? Exclude<keyof P1, keyof P2> extends never
-    ? NamedSelector<S, R>
-    : NamedParametricSelector<S, Omit<P1, keyof P2>, R>
-  : never;
+export type BoundSelector<S, P2, P1 extends Partial<P2>, R> =
+  P2 extends Pick<P1, keyof P2>
+    ? Exclude<keyof P1, keyof P2> extends never
+      ? NamedSelector<S, R>
+      : NamedParametricSelector<S, Omit<P1, keyof P2>, R>
+    : never;
 
 export type BoundSelectorOptions<S, P2, P1 extends Partial<P2>, R> = {
   bindingStrategy?: (
@@ -53,31 +51,23 @@ const innerCreateBoundSelector = <S, P2, P1 extends Partial<P2>, R>(
   binding: P2,
 ) => {
   const boundSelector = (state: S, props: Omit<P1, keyof P2> | void) =>
-    baseSelector(state, ({
+    baseSelector(state, {
       ...props,
       ...binding,
-    } as unknown) as P1);
+    } as unknown as P1);
 
   return boundSelector as BoundSelector<S, P2, P1, R>;
 };
 
-const createBoundInnerSelector = <
-  S,
-  P2 extends object,
-  P1 extends Partial<P2>,
-  R,
-  OR extends R
->(
+const createBoundInnerSelector = <S, P2 extends object, P1 extends Partial<P2>, R, OR extends R>(
   baseSelector: ParametricSelector<S, P1, R>,
   binding: P2,
   options: BoundSelectorOptions<S, P2, P1, OR> = {},
 ): BoundSelector<S, P2, P1, R> => {
   const bindingStrategy =
-    (options.bindingStrategy as typeof innerCreateBoundSelector) ??
-    innerCreateBoundSelector;
+    (options.bindingStrategy as typeof innerCreateBoundSelector) ?? innerCreateBoundSelector;
 
-  const keySelectorComposer =
-    options.keySelectorComposer ?? stringComposeKeySelectors;
+  const keySelectorComposer = options.keySelectorComposer ?? stringComposeKeySelectors;
 
   const boundSelector = bindingStrategy(baseSelector, binding);
 
@@ -98,7 +88,7 @@ const createBoundInnerSelector = <
   }
 
   if (isCachedSelector(baseSelector)) {
-    const cachedBoundSelector = (boundSelector as unknown) as CachedSelector;
+    const cachedBoundSelector = boundSelector as unknown as CachedSelector;
 
     if (baseSelector.getMatchingSelector) {
       cachedBoundSelector.getMatchingSelector = bindingStrategy(
@@ -131,9 +121,7 @@ const createBoundInnerSelector = <
             !paths.some((path) => arePathsEqual(keySelector.path, path)),
         )
         .map((keySelector) =>
-          isPropSelector(keySelector)
-            ? keySelector
-            : bindingStrategy(keySelector, binding),
+          isPropSelector(keySelector) ? keySelector : bindingStrategy(keySelector, binding),
         );
 
       if (keySelectors.length === 0) {
@@ -145,10 +133,7 @@ const createBoundInnerSelector = <
         cachedBoundSelector.keySelector = keySelectorComposer(...keySelectors);
       }
     } else {
-      cachedBoundSelector.keySelector = bindingStrategy(
-        baseKeySelector,
-        binding,
-      );
+      cachedBoundSelector.keySelector = bindingStrategy(baseKeySelector, binding);
     }
   }
 
@@ -159,7 +144,10 @@ export const createBoundSelector: typeof createBoundInnerSelector = (baseSelecto
   return createBoundInnerSelector(baseSelector, binding, {
     bindingStrategy: (selector, bindingProps) => {
       return (state, props) => {
-        const { result: nextProps, rollback } = temporaryAssign(props, bindingProps as Record<string, unknown>);
+        const { result: nextProps, rollback } = temporaryAssign(
+          props,
+          bindingProps as Record<string, unknown>,
+        );
         const result = selector(state, nextProps as Parameters<typeof baseSelector>[1]);
         rollback();
         return result;

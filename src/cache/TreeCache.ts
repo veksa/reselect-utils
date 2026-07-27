@@ -4,8 +4,7 @@ export type TreeCacheObjectOptions = {
   cacheObjectCreator?: () => ICacheObject;
 };
 
-const normalizeKey = (key: unknown): unknown[] =>
-  Array.isArray(key) ? key : [key];
+const normalizeKey = (key: unknown): unknown[] => (Array.isArray(key) ? key : [key]);
 
 class TreeCacheNode {
   public cache?: ICacheObject;
@@ -19,8 +18,7 @@ export class TreeCache implements ICacheObject {
   private root: TreeCacheNode;
 
   constructor(options: TreeCacheObjectOptions) {
-    this.cacheObjectCreator =
-      options.cacheObjectCreator ?? (() => new FlatObjectCache());
+    this.cacheObjectCreator = options.cacheObjectCreator ?? (() => new FlatObjectCache());
 
     const root = new TreeCacheNode();
     root.cache = this.cacheObjectCreator();
@@ -97,8 +95,6 @@ export class TreeCache implements ICacheObject {
   public isValidCacheKey(key: unknown) {
     const keyPath = normalizeKey(key);
 
-    return keyPath.every(
-      (item) => this.root.cache?.isValidCacheKey?.(item) ?? true,
-    );
+    return keyPath.every((item) => this.root.cache?.isValidCacheKey?.(item) ?? true);
   }
 }

@@ -6,10 +6,7 @@ export type OutputKeySelector<S, D> = KeySelector<S> & {
   dependencies: D;
 };
 
-export type OutputParametricKeySelector<S, P, D> = ParametricKeySelector<
-  S,
-  P
-> & {
+export type OutputParametricKeySelector<S, P, D> = ParametricKeySelector<S, P> & {
   dependencies: D;
 };
 
@@ -19,20 +16,14 @@ export function isComposedKeySelector<S>(
 
 export function isComposedKeySelector<S, P>(
   keySelector: ParametricKeySelector<S, P>,
-): keySelector is OutputParametricKeySelector<
-  S,
-  P,
-  ParametricKeySelector<S, P>[]
->;
+): keySelector is OutputParametricKeySelector<S, P, ParametricKeySelector<S, P>[]>;
 
 export function isComposedKeySelector<S, P>(
   keySelector: KeySelector<S> | ParametricKeySelector<S, P>,
 ): keySelector is
   | OutputKeySelector<S, KeySelector<S>>
   | OutputParametricKeySelector<S, P, ParametricKeySelector<S, P>[]> {
-  return (
-    'dependencies' in keySelector && composedKeySelectorSymbol in keySelector
-  );
+  return 'dependencies' in keySelector && composedKeySelectorSymbol in keySelector;
 }
 
 export type KeySelectorComposer = {
@@ -60,10 +51,7 @@ export type KeySelectorComposer = {
     keySelector1: KeySelector<S1>,
     keySelector2: KeySelector<S2>,
     keySelector3: KeySelector<S3>,
-  ): OutputKeySelector<
-    S1 & S2 & S3,
-    [KeySelector<S1>, KeySelector<S2>, KeySelector<S3>]
-  >;
+  ): OutputKeySelector<S1 & S2 & S3, [KeySelector<S1>, KeySelector<S2>, KeySelector<S3>]>;
 
   <S1, S2, S3, P1, P2, P3>(
     keySelector1: ParametricKeySelector<S1, P1>,
@@ -72,11 +60,7 @@ export type KeySelectorComposer = {
   ): OutputParametricKeySelector<
     S1 & S2 & S3,
     P1 & P2 & P3,
-    [
-      ParametricKeySelector<S1, P1>,
-      ParametricKeySelector<S2, P2>,
-      ParametricKeySelector<S3, P3>,
-    ]
+    [ParametricKeySelector<S1, P1>, ParametricKeySelector<S2, P2>, ParametricKeySelector<S3, P3>]
   >;
 
   <S1, S2, S3, S4>(
@@ -113,13 +97,7 @@ export type KeySelectorComposer = {
     keySelector5: KeySelector<S5>,
   ): OutputKeySelector<
     S1 & S2 & S3 & S4 & S5,
-    [
-      KeySelector<S1>,
-      KeySelector<S2>,
-      KeySelector<S3>,
-      KeySelector<S4>,
-      KeySelector<S5>,
-    ]
+    [KeySelector<S1>, KeySelector<S2>, KeySelector<S3>, KeySelector<S4>, KeySelector<S5>]
   >;
 
   <S1, S2, S3, S4, S5, P1, P2, P3, P4, P5>(
@@ -347,28 +325,7 @@ export type KeySelectorComposer = {
     ]
   >;
 
-  <
-    S1,
-    S2,
-    S3,
-    S4,
-    S5,
-    S6,
-    S7,
-    S8,
-    S9,
-    S10,
-    P1,
-    P2,
-    P3,
-    P4,
-    P5,
-    P6,
-    P7,
-    P8,
-    P9,
-    P10
-  >(
+  <S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10>(
     keySelector1: ParametricKeySelector<S1, P1>,
     keySelector2: ParametricKeySelector<S2, P2>,
     keySelector3: ParametricKeySelector<S3, P3>,
@@ -425,30 +382,7 @@ export type KeySelectorComposer = {
     ]
   >;
 
-  <
-    S1,
-    S2,
-    S3,
-    S4,
-    S5,
-    S6,
-    S7,
-    S8,
-    S9,
-    S10,
-    S11,
-    P1,
-    P2,
-    P3,
-    P4,
-    P5,
-    P6,
-    P7,
-    P8,
-    P9,
-    P10,
-    P11
-  >(
+  <S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11>(
     keySelector1: ParametricKeySelector<S1, P1>,
     keySelector2: ParametricKeySelector<S2, P2>,
     keySelector3: ParametricKeySelector<S3, P3>,
@@ -533,7 +467,7 @@ export type KeySelectorComposer = {
     P9,
     P10,
     P11,
-    P12
+    P12,
   >(
     keySelector1: ParametricKeySelector<S1, P1>,
     keySelector2: ParametricKeySelector<S2, P2>,
@@ -625,7 +559,7 @@ export type KeySelectorComposer = {
     P10,
     P11,
     P12,
-    P13
+    P13,
   >(
     keySelector1: ParametricKeySelector<S1, P1>,
     keySelector2: ParametricKeySelector<S2, P2>,
@@ -660,10 +594,7 @@ export type KeySelectorComposer = {
     ]
   >;
 
-  <S>(...keySelectors: KeySelector<S>[]): OutputKeySelector<
-    S,
-    KeySelector<S>[]
-  >;
+  <S>(...keySelectors: KeySelector<S>[]): OutputKeySelector<S, KeySelector<S>[]>;
 
   <S, P>(
     ...keySelectors: ParametricKeySelector<S, P>[]
@@ -675,12 +606,8 @@ export function createKeySelectorComposer<S, P>(
     ...keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[]
   ) => ParametricKeySelector<S, P>,
 ): KeySelectorComposer {
-  return ((
-    ...keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[]
-  ) => {
-    const resultSelector = baseKeySelectorComposer(
-      ...keySelectors,
-    ) as OutputParametricKeySelector<
+  return ((...keySelectors: (KeySelector<S> | ParametricKeySelector<S, P>)[]) => {
+    const resultSelector = baseKeySelectorComposer(...keySelectors) as OutputParametricKeySelector<
       S,
       P,
       (KeySelector<S> | ParametricKeySelector<S, P>)[]

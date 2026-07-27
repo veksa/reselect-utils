@@ -9,5 +9,5 @@ export function createSegmentSelector<State, SelectedSegment extends State[keyof
 ): (state: State) => SelectedSegment;
 
 export function createSegmentSelector<State>(fn: Function, initial: unknown) {
-  return (state: State) => (fn(state) ?? initial);
+  return (state: State) => fn(state) ?? initial;
 }
