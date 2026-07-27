@@ -2,9 +2,10 @@
   "compilerOptions": {
     "jsx": "react",
     "target": "es2015",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "lib": ["dom", "es2020"],
+    "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "importHelpers": true,
