@@ -5,9 +5,9 @@ import {createStructuredSelector} from '../createStructuredSelector';
 import {NamedParametricSelector} from '../types';
 import {isCachedSelector} from '../_helpers/isCachedSelector';
 
-jest.mock('../debug/debug', () => ({
-    ...jest.requireActual<object>('../debug/debug'),
-    isDebugMode: jest.fn(() => true),
+vi.mock('../debug/debug', async importOriginal => ({
+    ...await importOriginal<object>(),
+    isDebugMode: vi.fn(() => true),
 }));
 
 describe('createAdaptedSelector', () => {

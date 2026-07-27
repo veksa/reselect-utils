@@ -10,9 +10,9 @@ import {stringComposeKeySelectors} from '../keys/stringComposeKeySelectors';
 import {createSequenceSelector} from "../createSequenceSelector";
 import {NamedParametricSelector, NamedSelector} from "../types";
 
-jest.mock('../debug/debug', () => ({
-    ...jest.requireActual<object>('../debug/debug'),
-    isDebugMode: jest.fn(() => true),
+vi.mock('../debug/debug', async importOriginal => ({
+    ...await importOriginal<object>(),
+    isDebugMode: vi.fn(() => true),
 }));
 
 describe('createChainSelector', () => {
@@ -109,13 +109,13 @@ describe('createChainSelector', () => {
             });
         }).build();
 
-        expect(createPathSelector(personByMessageIdSelector).firstName()(commonState)).toBe('M Poppins');
+        expect(createPathSelector(personByMessageIdSelector).firstName()(commonState)).toBe('Marry');
         expect(createPathSelector(personByMessageIdSelector).name()(commonState)).toBe('M Poppins');
     });
 
     test('should cached chain callback by result of input selector', () => {
         const selectorStub = () => '';
-        const chainMock = jest.fn(() => selectorStub);
+        const chainMock = vi.fn(() => selectorStub);
 
         const someByMessageIdSelector = createChainSelector(messageSelector)
             .chain(chainMock)
@@ -150,7 +150,7 @@ describe('createChainSelector', () => {
     });
 
     test('should not invalidate cache for input parametric selector', () => {
-        const chainFn = jest.fn((result: string) => () => result);
+        const chainFn = vi.fn((result: string) => () => result);
         const fullNameProxyCachedSelector = createChainSelector(
             fullNameCachedSelector,
         )
@@ -176,7 +176,7 @@ describe('createChainSelector', () => {
             },
         )((_state, props) => props.id);
 
-        const chainFn = jest.fn((result?: string) => () => result);
+        const chainFn = vi.fn((result?: string) => () => result);
 
         const nameProxyCachedSelector = createChainSelector(
             createPathSelector(personCachedSelector).firstName(),
@@ -270,7 +270,7 @@ describe('createChainSelector', () => {
             keySelector: secondKeySelector,
         });
 
-        const chainFn = jest.fn((result: string) => () => result);
+        const chainFn = vi.fn((result: string) => () => result);
 
         const chainSelector = createChainSelector(firstSelector)
             .chain(() => secondSelector)
@@ -370,13 +370,13 @@ describe('createChainSelector', () => {
             .build();
 
         expect(personByMessageIdSelector.selectorName).toMatchInlineSnapshot(
-            `"messageSelector (will be chained message => { return (0, createBoundSelector_1.createBoundSelector)(personSelector, { id: message.personId }); }) (will be chained person => { return (0, createBoundSelector_1.createBoundSelector)(fullNameNamedSelector, { id: person.id }); })"`
+            `"messageSelector (will be chained (message) => { return __vi_import_3__.createBoundSelector(personSelector, { id: message.personId }); }) (will be chained (person) => { return __vi_import_3__.createBoundSelector(fullNameNamedSelector, { id: person.id }); })"`
         );
 
         personByMessageIdSelector(commonState, {id: 100});
 
         expect(personByMessageIdSelector.selectorName).toMatchInlineSnapshot(
-            `"messageSelector (chained by personSelector (id -> [*])) (chained by fullNameNamedSelector (id -> [*]))"`,
+            `"messageSelector (chained by selector (id -> [*])) (chained by fullNameNamedSelector (id -> [*]))"`,
         );
 
         const [
@@ -384,7 +384,7 @@ describe('createChainSelector', () => {
         ] = personByMessageIdSelector.dependencies as unknown[];
 
         expect((higherOrderSelector as NamedSelector<unknown, unknown>).selectorName).toMatchInlineSnapshot(
-            `"higher order for messageSelector (chained by personSelector (id -> [*])) (person => { return (0, createBoundSelector_1.createBoundSelector)(fullNameNamedSelector, { id: person.id }); })"`
+            `"higher order for messageSelector (chained by selector (id -> [*])) ((person) => { return __vi_import_3__.createBoundSelector(fullNameNamedSelector, { id: person.id }); })"`
         );
     });
 

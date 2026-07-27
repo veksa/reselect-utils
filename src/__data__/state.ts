@@ -48,6 +48,7 @@ export type State =
 
 export const commonState: State = {
     persons: {
+        currentPersonId: 1,
         data: {
             1: {
                 id: 1,

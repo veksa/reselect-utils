@@ -1,8 +1,19 @@
 {
   "env": {
     "browser": true,
-    "node": true,
-    "jest": true
+    "node": true
+  },
+  "globals": {
+    "describe": "readonly",
+    "it": "readonly",
+    "test": "readonly",
+    "expect": "readonly",
+    "beforeAll": "readonly",
+    "beforeEach": "readonly",
+    "afterAll": "readonly",
+    "afterEach": "readonly",
+    "vi": "readonly",
+    "vitest": "readonly"
   },
   "extends": [
     "airbnb-typescript",
