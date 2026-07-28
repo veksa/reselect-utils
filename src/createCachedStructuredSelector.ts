@@ -1,13 +1,7 @@
 import { createSelector, Selector, SelectorResultsMap, SelectorsObject } from '@veksa/reselect';
 import { createCachedSelector, PolymorphicCachedOptions } from './_reReselect';
 import { createStructuredSelector } from './createStructuredSelector';
-
-/** Union → intersection helper (not exported by reselect). */
-type UnionToIntersection<Union> = (
-  Union extends unknown ? (distributed: Union) => void : never
-) extends (merged: infer Intersection) => void
-  ? Intersection
-  : never;
+import { UnionToIntersection } from './types';
 
 /** Intersection of the `state` argument of every selector in the object. */
 type StructuredState<M extends SelectorsObject> = UnionToIntersection<

@@ -30,3 +30,14 @@ export type CachedSelector = Pick<ReReselectSelector, 'cache' | 'keySelector'> &
   Partial<ReReselectSelector>;
 
 export type Path = string[];
+
+/**
+ * Turns a union `A | B | C` into the intersection `A & B & C`. Not exported by
+ * reselect, so kept here for the selector-composition helpers that need to
+ * intersect the `state`/`props` of several selectors.
+ */
+export type UnionToIntersection<Union> = (
+  Union extends unknown ? (distributed: Union) => void : never
+) extends (merged: infer Intersection) => void
+  ? Intersection
+  : never;

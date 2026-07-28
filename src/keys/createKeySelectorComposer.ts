@@ -1,4 +1,5 @@
 import { KeySelector } from '../_reReselect';
+import { UnionToIntersection } from '../types';
 
 export const composedKeySelectorSymbol = Symbol.for('ComposedKeySelector');
 
@@ -7,13 +8,6 @@ export const composedKeySelectorSymbol = Symbol.for('ComposedKeySelector');
  * number of extra arguments (props, ...). Used for variadic tuple inference.
  */
 type AnyKeySelector = KeySelector<any>;
-
-/** Union → intersection helper (not exported by reselect). */
-type UnionToIntersection<Union> = (
-  Union extends unknown ? (distributed: Union) => void : never
-) extends (merged: infer Intersection) => void
-  ? Intersection
-  : never;
 
 /** Intersection of every input key selector's `state` argument. */
 type ComposedState<Ks extends readonly AnyKeySelector[]> = UnionToIntersection<
