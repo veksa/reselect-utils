@@ -5,7 +5,7 @@ import { isCachedSelector } from './_helpers/isCachedSelector';
 import { defaultKeySelector } from './keys/defaultKeySelector';
 import { stringComposeKeySelectors } from './keys/stringComposeKeySelectors';
 import { createKeySelectorCreator } from './keys/createKeySelectorCreator';
-import { isDebugMode } from './debug/debug';
+import { runInDebug, withDebugName } from './debug/withDebugName';
 import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
 import { getSelectorName } from './_helpers/getSelectorName';
 import { generateSelectorKey } from './_helpers/generateSelectorKey';
@@ -103,17 +103,11 @@ export function createChainSelector<S1, P1, R1>(
       keySelector,
     });
 
-    /* istanbul ignore else  */
-    if (process.env.NODE_ENV !== 'production') {
-      /* istanbul ignore else  */
-      if (isDebugMode()) {
-        defineDynamicSelectorName(higherOrderSelector, () => {
-          const baseName = getSelectorName(selector);
+    withDebugName(higherOrderSelector, () => {
+      const baseName = getSelectorName(selector);
 
-          return `higher order for ${baseName} (${stringifyFunction(fn)})`;
-        });
-      }
-    }
+      return `higher order for ${baseName} (${stringifyFunction(fn)})`;
+    });
 
     type CombineSelector = Selector<S1 & S2, R1 & R2, [P1 & P2]> & {
       dependencies: any;
@@ -126,29 +120,25 @@ export function createChainSelector<S1, P1, R1>(
 
       combinedSelector.dependencies = [higherOrderSelector, derivedSelector];
 
-      /* istanbul ignore else  */
-      if (process.env.NODE_ENV !== 'production') {
-        /* istanbul ignore else  */
-        if (isDebugMode()) {
-          const derivedSelectorName = getSelectorName(derivedSelector);
+      runInDebug(() => {
+        const derivedSelectorName = getSelectorName(derivedSelector);
 
-          if (!derivedSelectorName) {
-            defineDynamicSelectorName(derivedSelector, () => {
-              const baseName = getSelectorName(selector);
-              const derivedSelectorKey = generateSelectorKey(derivedSelector);
-
-              return `derived from ${baseName} (${derivedSelectorKey})`;
-            });
-          }
-
-          defineDynamicSelectorName(combinedSelector, () => {
+        if (!derivedSelectorName) {
+          defineDynamicSelectorName(derivedSelector, () => {
             const baseName = getSelectorName(selector);
-            const dependencyName = getSelectorName(derivedSelector);
+            const derivedSelectorKey = generateSelectorKey(derivedSelector);
 
-            return `${baseName} (chained by ${dependencyName})`;
+            return `derived from ${baseName} (${derivedSelectorKey})`;
           });
         }
-      }
+
+        defineDynamicSelectorName(combinedSelector, () => {
+          const baseName = getSelectorName(selector);
+          const dependencyName = getSelectorName(derivedSelector);
+
+          return `${baseName} (chained by ${dependencyName})`;
+        });
+      });
 
       return derivedSelector(state, props);
     };
@@ -173,17 +163,11 @@ export function createChainSelector<S1, P1, R1>(
       return derivedKeySelector(state, props);
     };
 
-    /* istanbul ignore else  */
-    if (process.env.NODE_ENV !== 'production') {
-      /* istanbul ignore else  */
-      if (isDebugMode()) {
-        defineDynamicSelectorName(combinedSelector, () => {
-          const baseName = getSelectorName(selector);
+    withDebugName(combinedSelector, () => {
+      const baseName = getSelectorName(selector);
 
-          return `${baseName} (will be chained ${stringifyFunction(fn)})`;
-        });
-      }
-    }
+      return `${baseName} (will be chained ${stringifyFunction(fn)})`;
+    });
 
     const nextPrevChain = Object.assign(fn, {
       parentChain: prevChain,
@@ -201,17 +185,11 @@ export function createChainSelector<S1, P1, R1>(
       const output = fn(result);
       const mapSelector = () => output;
 
-      /* istanbul ignore else  */
-      if (process.env.NODE_ENV !== 'production') {
-        /* istanbul ignore else  */
-        if (isDebugMode()) {
-          defineDynamicSelectorName(mapSelector, () => {
-            const baseName = getSelectorName(selector);
+      withDebugName(mapSelector, () => {
+        const baseName = getSelectorName(selector);
 
-            return `mapped from ${baseName} (${stringifyFunction(fn)})`;
-          });
-        }
-      }
+        return `mapped from ${baseName} (${stringifyFunction(fn)})`;
+      });
 
       return mapSelector;
     };

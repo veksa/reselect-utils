@@ -1,7 +1,6 @@
 import { Selector } from '@veksa/reselect';
 import { CachedSelector, NamedParametricSelector } from './types';
-import { isDebugMode } from './debug/debug';
-import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
+import { withDebugName } from './debug/withDebugName';
 import { getSelectorName } from './_helpers/getSelectorName';
 import { isCachedSelector } from './_helpers/isCachedSelector';
 
@@ -42,18 +41,12 @@ export const createAdaptedSelector = <S, P1 extends object, P2, R>(
   Object.assign(adaptedSelector, baseSelector);
   adaptedSelector.dependencies = [baseSelector];
 
-  /* istanbul ignore else  */
-  if (process.env.NODE_ENV !== 'production') {
-    /* istanbul ignore else  */
-    if (isDebugMode()) {
-      defineDynamicSelectorName(adaptedSelector, () => {
-        const baseName = getSelectorName(baseSelector);
-        const mappingName = generateMappingName(mapping);
+  withDebugName(adaptedSelector, () => {
+    const baseName = getSelectorName(baseSelector);
+    const mappingName = generateMappingName(mapping);
 
-        return `${baseName} (${mappingName})`;
-      });
-    }
-  }
+    return `${baseName} (${mappingName})`;
+  });
 
   if (isCachedSelector(baseSelector)) {
     const cachedAdaptedSelector = adaptedSelector as unknown as CachedSelector;

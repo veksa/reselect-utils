@@ -1,8 +1,7 @@
 import { Selector } from '@veksa/reselect';
 import { NamedParametricSelector, NamedSelector, Path } from './types';
 import { isObject } from './_helpers/isObject';
-import { isDebugMode } from './debug/debug';
-import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
+import { withDebugName } from './debug/withDebugName';
 import { getSelectorName } from './_helpers/getSelectorName';
 
 export type Defined<T> = Exclude<T, undefined>;
@@ -166,17 +165,11 @@ export const innerCreatePathSelector = (
 
     applyMeta(resultSelector);
 
-    /* istanbul ignore else  */
-    if (process.env.NODE_ENV !== 'production') {
-      /* istanbul ignore else  */
-      if (isDebugMode()) {
-        defineDynamicSelectorName(resultSelector, () => {
-          const baseName = getSelectorName(baseSelector);
+    withDebugName(resultSelector, () => {
+      const baseName = getSelectorName(baseSelector);
 
-          return [baseName, ...path].join('.');
-        });
-      }
-    }
+      return [baseName, ...path].join('.');
+    });
 
     return resultSelector;
   };

@@ -5,8 +5,7 @@ import { isPropSelector } from './createPropSelector';
 import { excludeDefaultSelectors } from './keys/createKeySelectorCreator';
 import { stringComposeKeySelectors } from './keys/stringComposeKeySelectors';
 import { temporaryAssign } from './_helpers/temporaryAssign';
-import { isDebugMode } from './debug/debug';
-import { defineDynamicSelectorName } from './_helpers/defineDynamicSelectorName';
+import { withDebugName } from './debug/withDebugName';
 import { getSelectorName } from './_helpers/getSelectorName';
 import { isCachedSelector } from './_helpers/isCachedSelector';
 import { isObject } from './_helpers/isObject';
@@ -74,18 +73,12 @@ const createBoundInnerSelector = <S, P2 extends object, P1 extends Partial<P2>, 
   Object.assign(boundSelector, baseSelector);
   boundSelector.dependencies = [baseSelector];
 
-  /* istanbul ignore else  */
-  if (process.env.NODE_ENV !== 'production') {
-    /* istanbul ignore else  */
-    if (isDebugMode()) {
-      defineDynamicSelectorName(boundSelector, () => {
-        const baseName = getSelectorName(baseSelector);
-        const bindingName = generateBindingName(binding);
+  withDebugName(boundSelector, () => {
+    const baseName = getSelectorName(baseSelector);
+    const bindingName = generateBindingName(binding);
 
-        return `${baseName} (${bindingName})`;
-      });
-    }
-  }
+    return `${baseName} (${bindingName})`;
+  });
 
   if (isCachedSelector(baseSelector)) {
     const cachedBoundSelector = boundSelector as unknown as CachedSelector;
