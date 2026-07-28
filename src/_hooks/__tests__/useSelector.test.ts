@@ -17,9 +17,6 @@ const createMockStore = (state: State) => {
       return () => listeners.delete(listener);
     },
     replaceReducer: () => undefined,
-    [Symbol.observable ?? '@@observable']() {
-      return this;
-    },
   };
 
   return store as unknown as never;

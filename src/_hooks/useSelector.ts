@@ -2,9 +2,11 @@ import { shallowEqual, useSelector as useReduxSelector } from '@veksa/react-redu
 import { useMemoWith } from './useMemoWith';
 import { useCallback, useMemo } from 'react';
 
-export function useSelector<S extends object, R, Params extends readonly unknown[]>(
-  selector: (state: S, ...params: Params) => R,
-  ...params: Params
+export function useSelector<S extends object, R>(selector: (state: S) => R): R;
+
+export function useSelector<S extends object, P, R>(
+  selector: (state: S, props: P) => R,
+  props: P,
 ): R;
 
 export function useSelector(selector: Function, ...params: any[]) {
