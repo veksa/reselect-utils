@@ -6,38 +6,40 @@ let cacheItemCounter = 0;
 
 const cacheLifetime = 10000;
 
+let garbageCollectorStarted = false;
+
 const runGarbageCollector = () => {
-  const currentTime = new Date().getTime();
+  const currentTime = Date.now();
 
   const ids = Object.keys(cache);
 
   for (let i = 0; i < ids.length; i++) {
-    const keys = Object.keys(ids[i]);
+    const bucket = cache[ids[i]];
+    const keys = Object.keys(bucket);
 
     for (let j = 0; j < keys.length; j++) {
-      if (cache[ids[i]][keys[j]]) {
-        if (currentTime - cache[ids[i]][keys[j]].time > cacheLifetime) {
-          delete cache[ids[i]][keys[j]];
-        }
+      if (currentTime - bucket[keys[j]].time > cacheLifetime) {
+        delete bucket[keys[j]];
       }
     }
   }
 
-  window.setTimeout(() => {
-    runGarbageCollector();
-  }, cacheLifetime);
+  window.setTimeout(runGarbageCollector, cacheLifetime);
 };
 
 export const initGarbageCollector = () => {
+  if (garbageCollectorStarted) {
+    return;
+  }
+
   if (typeof window !== 'undefined') {
+    garbageCollectorStarted = true;
     window.setTimeout(runGarbageCollector, cacheLifetime);
   }
 };
 
 export class IntervalMapCache implements ICacheObject {
   private id = cacheItemCounter++;
-
-  private date = new Date();
 
   public set(key: any, data: any) {
     if (cache[this.id] === undefined) {
@@ -46,7 +48,7 @@ export class IntervalMapCache implements ICacheObject {
 
     cache[this.id][key] = {
       data,
-      time: this.date.getTime(),
+      time: Date.now(),
     };
   }
 
@@ -56,7 +58,7 @@ export class IntervalMapCache implements ICacheObject {
     }
 
     if (cache[this.id][key] !== undefined) {
-      cache[this.id][key].time = this.date.getTime();
+      cache[this.id][key].time = Date.now();
 
       return cache[this.id][key].data;
     }
@@ -65,6 +67,10 @@ export class IntervalMapCache implements ICacheObject {
   }
 
   public remove(key: any) {
+    if (cache[this.id] === undefined) {
+      return;
+    }
+
     delete cache[this.id][key];
   }
 
