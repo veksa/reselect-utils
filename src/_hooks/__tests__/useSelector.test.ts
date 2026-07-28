@@ -4,6 +4,13 @@ import { renderHook } from '@testing-library/react';
 import { Provider } from '@veksa/react-redux';
 import { useSelector } from '../useSelector';
 
+// `children` is passed positionally (oxlint forbids it as a prop), so relax the
+// Provider's prop type to make `children` optional in the props object.
+const StoreProvider = Provider as unknown as (props: {
+  store: unknown;
+  children?: ReactNode;
+}) => ReactNode;
+
 type State = { count: number };
 
 const createMockStore = (state: State) => {
@@ -25,7 +32,7 @@ const createMockStore = (state: State) => {
 const wrapperWith =
   (store: never) =>
   ({ children }: { children: ReactNode }) =>
-    createElement(Provider, { store, children });
+    createElement(StoreProvider, { store }, children);
 
 describe('useSelector', () => {
   const state: State = { count: 5 };
