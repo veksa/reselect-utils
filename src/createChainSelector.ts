@@ -118,9 +118,12 @@ export function createChainSelector<S1, P1, R1>(
     const combinedSelector: CombineSelector = (state: S1 & S2, props: P1 & P2): R1 & R2 => {
       const derivedSelector: any = (higherOrderSelector as any)(state, props);
 
-      combinedSelector.dependencies = [higherOrderSelector, derivedSelector];
-
       runInDebug(() => {
+        // Debug-only: shows the branch this call took. Nothing outside the debug
+        // tooling reads it, so in production it was an array allocated per call and
+        // abandoned. The static `[higherOrderSelector]` below still stands.
+        combinedSelector.dependencies = [higherOrderSelector, derivedSelector];
+
         const derivedSelectorName = getSelectorName(derivedSelector);
 
         if (!derivedSelectorName) {
