@@ -1,4 +1,5 @@
-import { FlatMapCache } from '../../_reReselect';
+import { FlatMapCache, createCachedSelector } from '../../_reReselect';
+import { IntervalMapCache } from '../intervalMapCache';
 import { TreeCache } from '../TreeCache';
 
 describe('TreeCache', () => {
@@ -106,6 +107,40 @@ describe('TreeCache', () => {
     cache.clear();
     expect(cache.get(['some', 'deep', 'key'])).toBeUndefined();
     expect(cache.get(['some', 'other', 'key'])).toBeUndefined();
+  });
+
+  test('should back a cached selector without rebinding its validator', () => {
+    /**
+     * `TreeCache.isValidCacheKey` reads `this.root`, so it only answers when the
+     * cached selector calls it as a method on the cache. A selector that detaches
+     * the validator into a local and calls it bare leaves `this` undefined and
+     * throws on the very first lookup, which makes a TreeCache-backed selector
+     * unusable rather than merely slow — and dropping the validator instead is no
+     * escape, since the default one rejects the array keys this cache exists to
+     * index.
+     */
+    const cache = new TreeCache({
+      cacheObjectCreator: () => new IntervalMapCache(),
+    });
+
+    type State = { items: Record<number, number> };
+    type Props = { id: number; kind: string };
+
+    const selector = createCachedSelector(
+      (state: State, props: Props) => state.items[props.id],
+      (value: number) => value * 2,
+    )({
+      // A composite key is the whole reason to reach for TreeCache: it indexes the
+      // array level by level instead of stringifying it.
+      keySelector: (_state: State, props: Props) => [props.id, props.kind],
+      cacheObject: cache,
+    });
+
+    const state = { items: { 1: 21 } };
+
+    expect(selector(state, { id: 1, kind: 'a' })).toBe(42);
+    expect(selector(state, { id: 1, kind: 'a' })).toBe(42);
+    expect(selector.recomputations()).toBe(1);
   });
 
   test('should treat a scalar key as a one-level path', () => {
