@@ -149,21 +149,37 @@ export function createChainSelector<S1, P1, R1>(
     combinedSelector.dependencies = [higherOrderSelector];
     combinedSelector.cache = higherOrderSelector.cache;
 
-    const higherOrderKeySelector = createCachedSelector(
-      [higherOrderSelector],
-      (derivedSelector) => {
-        return keySelectorCreator({
-          inputSelectors: [higherOrderSelector, derivedSelector],
-        });
-      },
-    )({
-      ...createSelectorOptions(),
-      keySelector,
-    });
+    /**
+     * The derived selector's key selector, memoized on the derived selector itself.
+     *
+     * This used to be a second `createCachedSelector` over `[higherOrderSelector]`,
+     * which meant every key computation paid a whole extra cached-selector layer —
+     * its own key computation, its own cache lookup, and its own evaluation of
+     * `higherOrderSelector` — to produce a value that depends on nothing but the
+     * derived selector. A `WeakMap` keyed on that selector is the same mapping with
+     * none of the layer, and it shares across cache keys rather than per key.
+     *
+     * Note what is deliberately *not* memoized: the `(state, props)` pair. `props`
+     * is mutated in place by `createBoundSelector`, so two calls can pass the same
+     * object reference with different contents, and a reference-keyed cache would
+     * hand back a stale selector.
+     */
+    const derivedKeySelectors = new WeakMap<object, KeySelector<S1 & S2>>();
 
     combinedSelector.keySelector = (state: S1 & S2, props: P1 & P2) => {
-      const derivedKeySelector = (higherOrderKeySelector as any)(state, props);
-      return derivedKeySelector(state, props);
+      const derivedSelector: any = (higherOrderSelector as any)(state, props);
+
+      let derivedKeySelector = derivedKeySelectors.get(derivedSelector);
+
+      if (derivedKeySelector === undefined) {
+        derivedKeySelector = keySelectorCreator({
+          inputSelectors: [higherOrderSelector, derivedSelector],
+        }) as KeySelector<S1 & S2>;
+
+        derivedKeySelectors.set(derivedSelector, derivedKeySelector);
+      }
+
+      return (derivedKeySelector as any)(state, props);
     };
 
     withDebugName(combinedSelector, () => {
