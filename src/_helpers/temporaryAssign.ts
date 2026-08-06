@@ -1,3 +1,5 @@
+const noop = () => undefined;
+
 export function temporaryAssign(
   target: Record<string, unknown>,
   source: Record<string, unknown>,
@@ -8,12 +10,17 @@ export function temporaryAssign(
   if (typeof target !== 'object' || target === null) {
     return {
       result: source,
-      rollback: () => undefined,
+      rollback: noop,
     };
   }
 
-  const temporary: Record<string, unknown> = {};
-  const deleteProps: string[] = [];
+  // Both containers and the closure are allocated only once something actually has
+  // to be restored. This runs on every call of every bound selector, and the usual
+  // case is a binding whose keys the target does not have — one entry in
+  // `deleteProps`, nothing in `temporary` — while a re-entrant call that finds the
+  // binding already applied changes nothing at all and can share `noop`.
+  let temporary: Record<string, unknown> | null = null;
+  let deleteProps: string[] | null = null;
 
   for (const prop in source as unknown as object) {
     if (Object.prototype.hasOwnProperty.call(source, prop)) {
@@ -22,8 +29,14 @@ export function temporaryAssign(
 
       if (targetProp !== sourceProp) {
         if (Object.prototype.hasOwnProperty.call(target, prop)) {
+          if (temporary === null) {
+            temporary = {};
+          }
           temporary[prop] = targetProp;
         } else {
+          if (deleteProps === null) {
+            deleteProps = [];
+          }
           deleteProps.push(prop);
         }
 
@@ -32,16 +45,30 @@ export function temporaryAssign(
     }
   }
 
+  if (temporary === null && deleteProps === null) {
+    return {
+      result: target,
+      rollback: noop,
+    };
+  }
+
+  const restore = temporary;
+  const remove = deleteProps;
+
   const rollback = () => {
-    for (const prop in temporary) {
-      if (Object.prototype.hasOwnProperty.call(temporary, prop)) {
-        target[prop] = temporary[prop];
+    if (restore !== null) {
+      for (const prop in restore) {
+        if (Object.prototype.hasOwnProperty.call(restore, prop)) {
+          target[prop] = restore[prop];
+        }
       }
     }
 
-    for (const prop of deleteProps) {
-      if (Object.prototype.hasOwnProperty.call(target, prop)) {
-        delete target[prop];
+    if (remove !== null) {
+      for (const prop of remove) {
+        if (Object.prototype.hasOwnProperty.call(target, prop)) {
+          delete target[prop];
+        }
       }
     }
   };
