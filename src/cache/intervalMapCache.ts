@@ -1,8 +1,18 @@
 import { ICacheObject } from '../_reReselect';
 
-const cache: Record<string, Record<string, { data: object; time: number }>> = {};
+interface CacheEntry {
+  data: unknown;
+  time: number;
+}
 
-let cacheItemCounter = 0;
+/**
+ * Buckets used to live in a module-level `Record<string, …>` keyed by an
+ * incrementing numeric id, which meant every `get` and `set` coerced that number to
+ * a string and re-read the global record — four times per cache hit in `get`.
+ * Holding the entries on the instance removes both, and a `Map` keeps non-string
+ * keys as they are instead of stringifying them.
+ */
+const buckets = new Set<IntervalMapCache>();
 
 const cacheLifetime = 10000;
 
@@ -11,18 +21,9 @@ let garbageCollectorStarted = false;
 const runGarbageCollector = () => {
   const currentTime = Date.now();
 
-  const ids = Object.keys(cache);
-
-  for (let i = 0; i < ids.length; i++) {
-    const bucket = cache[ids[i]];
-    const keys = Object.keys(bucket);
-
-    for (let j = 0; j < keys.length; j++) {
-      if (currentTime - bucket[keys[j]].time > cacheLifetime) {
-        delete bucket[keys[j]];
-      }
-    }
-  }
+  buckets.forEach((bucket) => {
+    bucket.sweep(currentTime);
+  });
 
   window.setTimeout(runGarbageCollector, cacheLifetime);
 };
@@ -39,42 +40,52 @@ export const initGarbageCollector = () => {
 };
 
 export class IntervalMapCache implements ICacheObject {
-  private id = cacheItemCounter++;
+  private entries = new Map<unknown, CacheEntry>();
+
+  constructor() {
+    buckets.add(this);
+  }
 
   public set(key: any, data: any) {
-    if (cache[this.id] === undefined) {
-      cache[this.id] = {};
-    }
+    const entry = this.entries.get(key);
 
-    cache[this.id][key] = {
-      data,
-      time: Date.now(),
-    };
+    if (entry === undefined) {
+      this.entries.set(key, { data, time: Date.now() });
+    } else {
+      entry.data = data;
+      entry.time = Date.now();
+    }
   }
 
   public get(key: any) {
-    if (cache[this.id] === undefined) {
-      cache[this.id] = {};
+    const entry = this.entries.get(key);
+
+    if (entry === undefined) {
+      return undefined;
     }
 
-    if (cache[this.id][key] !== undefined) {
-      cache[this.id][key].time = Date.now();
+    entry.time = Date.now();
 
-      return cache[this.id][key].data;
-    }
-
-    return undefined;
+    return entry.data;
   }
 
   public remove(key: any) {
-    if (cache[this.id] === undefined) {
-      return;
-    }
-
-    delete cache[this.id][key];
+    this.entries.delete(key);
   }
 
   public clear() {
-    delete cache[this.id];
+    this.entries.clear();
+  }
+
+  /**
+   * Drops entries untouched for longer than the lifetime. Called by the collector
+   * rather than by the cache itself, so the sweep stays one pass over every bucket.
+   */
+  public sweep(currentTime: number) {
+    this.entries.forEach((entry, key) => {
+      if (currentTime - entry.time > cacheLifetime) {
+        this.entries.delete(key);
+      }
+    });
   }
 }
