@@ -108,6 +108,37 @@ describe('TreeCache', () => {
     expect(cache.get(['some', 'other', 'key'])).toBeUndefined();
   });
 
+  test('should treat a scalar key as a one-level path', () => {
+    const cache = new TreeCache({});
+    const selectorFn = () => undefined;
+
+    cache.set('key', selectorFn);
+
+    // The scalar and the single-element path address the same node, so `get` must
+    // not be able to tell them apart.
+    expect(cache.get('key')).toBe(selectorFn);
+    expect(cache.get(['key'])).toBe(selectorFn);
+
+    expect(cache.get('missing')).toBeUndefined();
+
+    cache.set(['other'], selectorFn);
+    expect(cache.get('other')).toBe(selectorFn);
+
+    cache.remove('key');
+    expect(cache.get('key')).toBeUndefined();
+    expect(cache.get(['key'])).toBeUndefined();
+  });
+
+  test('should return undefined for a scalar key that addresses an inner node', () => {
+    const cache = new TreeCache({});
+    const selectorFn = () => undefined;
+
+    cache.set(['some', 'deep'], selectorFn);
+
+    // `some` exists as a node but holds no selector of its own.
+    expect(cache.get('some')).toBeUndefined();
+  });
+
   test('should persist values in middle of tree', () => {
     const cache = new TreeCache({});
     const selectorFn = () => undefined;

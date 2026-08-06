@@ -32,11 +32,19 @@ export class TreeCache implements ICacheObject {
   }
 
   public get(key: unknown) {
-    const keyPath = normalizeKey(key);
+    // A scalar key is the common case and `normalizeKey` would wrap it in a fresh
+    // array on every lookup. The tree walk for one level is a single cache read, so
+    // it is spelled out rather than allocated for.
+    if (!Array.isArray(key)) {
+      const cacheResponse: unknown = this.root.cache?.get(key);
+
+      return cacheResponse instanceof TreeCacheNode ? cacheResponse.selectorFn : undefined;
+    }
+
     let currentNode = this.root;
 
-    for (let i = 0; i < keyPath.length; i += 1) {
-      const item = keyPath[i];
+    for (let i = 0; i < key.length; i += 1) {
+      const item = key[i];
       const cacheResponse: unknown = currentNode.cache?.get(item);
 
       if (cacheResponse instanceof TreeCacheNode) {
@@ -92,9 +100,27 @@ export class TreeCache implements ICacheObject {
     currentNode.selectorFn = undefined;
   }
 
+  /**
+   * Called by re-reselect on every cache operation, so neither the wrapping array
+   * nor the `every` callback is allocated here.
+   */
   public isValidCacheKey(key: unknown) {
-    const keyPath = normalizeKey(key);
+    const rootCache = this.root.cache;
 
-    return keyPath.every((item) => this.root.cache?.isValidCacheKey?.(item) ?? true);
+    if (rootCache?.isValidCacheKey === undefined) {
+      return true;
+    }
+
+    if (!Array.isArray(key)) {
+      return rootCache.isValidCacheKey(key);
+    }
+
+    for (let i = 0; i < key.length; i += 1) {
+      if (!rootCache.isValidCacheKey(key[i])) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
