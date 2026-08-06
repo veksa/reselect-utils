@@ -146,12 +146,26 @@ export const innerCreatePathSelector = (
   path: Path = [],
   applyMeta: (selector: unknown) => void = defaultVoidFunction,
 ): unknown => {
-  const proxyTarget = (defaultValue?: unknown) => {
-    function resultSelector() {
-      // performance optimisation
-      let result = baseSelector.apply(null, arguments as unknown as unknown[]);
+  const pathLength = path.length;
 
-      for (let i = 0; i < path.length && isObject(result); i += 1) {
+  const proxyTarget = (defaultValue?: unknown) => {
+    function resultSelector(state?: unknown, props?: unknown) {
+      // Selectors are almost always reached as `(state)` or `(state, props)`, and
+      // dispatching those two arities directly keeps `arguments` out of the hot
+      // path. The arity is matched exactly rather than always passing two: reselect
+      // memoizes on the argument list, so handing a one-argument selector a second
+      // `undefined` would change its cache key.
+      let result: unknown;
+
+      if (arguments.length === 2) {
+        result = baseSelector(state, props);
+      } else if (arguments.length === 1) {
+        result = baseSelector(state);
+      } else {
+        result = baseSelector.apply(null, arguments as unknown as unknown[]);
+      }
+
+      for (let i = 0; i < pathLength && isObject(result); i += 1) {
         result = result[path[i]];
       }
 
