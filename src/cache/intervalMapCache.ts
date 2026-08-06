@@ -22,7 +22,13 @@ const runGarbageCollector = () => {
   const currentTime = Date.now();
 
   buckets.forEach((bucket) => {
-    bucket.sweep(currentTime);
+    if (bucket.sweep(currentTime)) {
+      // A bucket the sweep emptied is dropped from the registry, so a cache whose
+      // selector has been discarded stops being reachable from module scope and
+      // becomes collectable. Registration happens again on the next `set`, so a
+      // cache that is still in use simply re-enters.
+      buckets.delete(bucket);
+    }
   });
 
   window.setTimeout(runGarbageCollector, cacheLifetime);
@@ -42,14 +48,11 @@ export const initGarbageCollector = () => {
 export class IntervalMapCache implements ICacheObject {
   private entries = new Map<unknown, CacheEntry>();
 
-  constructor() {
-    buckets.add(this);
-  }
-
   public set(key: any, data: any) {
     const entry = this.entries.get(key);
 
     if (entry === undefined) {
+      buckets.add(this);
       this.entries.set(key, { data, time: Date.now() });
     } else {
       entry.data = data;
@@ -75,11 +78,12 @@ export class IntervalMapCache implements ICacheObject {
 
   public clear() {
     this.entries.clear();
+    buckets.delete(this);
   }
 
   /**
-   * Drops entries untouched for longer than the lifetime. Called by the collector
-   * rather than by the cache itself, so the sweep stays one pass over every bucket.
+   * Drops entries untouched for longer than the lifetime. Returns whether the
+   * bucket is now empty, which is what lets the collector unregister it.
    */
   public sweep(currentTime: number) {
     this.entries.forEach((entry, key) => {
@@ -87,5 +91,7 @@ export class IntervalMapCache implements ICacheObject {
         this.entries.delete(key);
       }
     });
+
+    return this.entries.size === 0;
   }
 }
